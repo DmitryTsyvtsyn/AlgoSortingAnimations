@@ -1,0 +1,18 @@
+[versions]
+agp = "8.1.2"
+org-jetbrains-kotlin-android = "1.9.0"
+core-ktx = "1.9.0"
+junit = "4.13.2"
+appcompat = "1.6.1"
+
+[libraries]
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+[plugins]
+com-android-application = { id = "com.android.application", version.ref = "agp" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
+
+[bundles]
+
