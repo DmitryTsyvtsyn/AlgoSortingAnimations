@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import io.github.dmitrytsyvtsyn.algosortinganimations.R
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreButton
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreLinearLayout
@@ -15,7 +16,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.la
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.linearLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.padding
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceAttribute
-import io.github.dmitrytsyvtsyn.algosortinganimations.main.SortingAlgorithmViewModel
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -74,6 +75,9 @@ class SortingAlgorithmSelectionFragment(
                 }
             }
         }
+
+        val (top, bottom) = parent.getTag(R.id.system_bar_insets) as Pair<Int, Int>
+        padding(top = top, bottom = bottom)
 
     }
 

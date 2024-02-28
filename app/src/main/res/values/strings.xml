@@ -4,7 +4,7 @@
     <string name="pause">Pause</string>
     <string name="bubble_sort">Bubble sort</string>
     <string name="bubble_sort_improved">Bubble sort improved</string>
-    <string name="random_array">Random array</string>
+    <string name="new_array">New array</string>
     <string name="worst_case_time">Worst-case time:</string>
     <string name="best_case_time">Best-case time:</string>
     <string name="average_time">Average time:</string>
@@ -16,4 +16,7 @@
     <string name="swaping_numbers">Меняем местами %1$d и %2$d потому что число %3$d больше числа %4$d</string>
     <string name="numbers_are_ordered">Числа %1$d и %2$d следуют в правильном порядке</string>
     <string name="numbers_was_replaced">Числа %1$d и %2$d успешно поменялись местами</string>
+    <string name="random_array">Random array</string>
+    <string name="sorted_array">Sorted array</string>
+    <string name="ok">OK</string>
 </resources>

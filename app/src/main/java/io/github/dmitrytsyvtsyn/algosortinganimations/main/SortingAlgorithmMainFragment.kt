@@ -5,7 +5,9 @@ import android.content.Context
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
+import android.view.WindowInsets
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
@@ -26,6 +28,9 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.vi
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.shape.ShapeTreatmentStrategy
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceAttribute
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.customview.SortingAlgorithmView
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs.SortingNewArrayActionsDialog
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAnimationButtonState
 import io.github.dmitrytsyvtsyn.algosortinganimations.selection.SortingAlgorithmSelectionFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +39,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("ViewConstructor")
 class SortingAlgorithmMainFragment(
-    parent: ViewGroup,
+    private val parent: ViewGroup,
     viewModel: SortingAlgorithmViewModel
 ) : CoreLinearLayout(parent.context) {
 
@@ -124,10 +129,12 @@ class SortingAlgorithmMainFragment(
 
         val randomArrayButton = CoreButton(
             ctx = context,
-            shapeTreatmentStrategy = ShapeTreatmentStrategy.None()
+            shapeTreatmentStrategy = ShapeTreatmentStrategy.AllRounded()
         )
-        randomArrayButton.setText(R.string.random_array)
-        randomArrayButton.setOnClickListener { viewModel.generateRandomArray() }
+        randomArrayButton.setText(R.string.new_array)
+        randomArrayButton.setOnClickListener {
+            parent.addView(SortingNewArrayActionsDialog(parent, viewModel))
+        }
         randomArrayButton.layoutParams(linearLayoutParams().wrap()
             .marginStart(context.dp(12))
             .marginEnd(context.dp(16)))
@@ -216,6 +223,13 @@ class SortingAlgorithmMainFragment(
             }
         }
 
+    }
+
+    override fun onApplyWindowInsets(insets: WindowInsets?): WindowInsets {
+        val (top, bottom) = parent.getTag(R.id.system_bar_insets) as Pair<Int, Int>
+        padding(top = top, bottom = bottom)
+
+        return super.onApplyWindowInsets(insets)
     }
 
     class ComplexityView(ctx: Context) : CoreFrameLayout(ctx) {

@@ -5,11 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import io.github.dmitrytsyvtsyn.algosortinganimations.main.SortingAlgorithmViewModel
+import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreFrameLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.frameLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.padding
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.viewGroupLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.SortingAlgorithmMainFragment
@@ -36,11 +36,11 @@ class MainActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(fragmentContainerView) { _, windowInsets ->
             val systemBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            fragmentContainerView.padding(top = systemBarsInsets.top, bottom = systemBarsInsets.bottom)
+            fragmentContainerView.setTag(R.id.system_bar_insets, systemBarsInsets.top to systemBarsInsets.bottom)
 
-            WindowInsetsCompat.CONSUMED
+            windowInsets
+            //WindowInsetsCompat.CONSUMED
         }
-
     }
 
 }
