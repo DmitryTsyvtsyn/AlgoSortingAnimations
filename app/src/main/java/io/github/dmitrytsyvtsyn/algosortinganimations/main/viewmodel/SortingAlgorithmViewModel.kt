@@ -25,6 +25,9 @@ class SortingAlgorithmViewModel(
 
     private val _buttonState = MutableStateFlow(SortingAnimationButtonState.PAUSED)
     val buttonState = _buttonState.asStateFlow()
+
+    val arrayCopy: IntArray
+        get() = _algorithmDetailState.value.arrayCopy
     
     fun changeSortingAlgorithm(algorithm: SortingAlgorithm) {
         _algorithmDetailState.value = _algorithmDetailState.value.copyWithSelectedAlgorithm(algorithm)

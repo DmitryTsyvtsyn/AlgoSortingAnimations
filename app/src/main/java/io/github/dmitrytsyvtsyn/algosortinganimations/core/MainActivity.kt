@@ -1,11 +1,14 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.core
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreFrameLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.frameLayoutParams
@@ -29,18 +32,37 @@ class MainActivity : AppCompatActivity() {
         fragment.layoutParams(frameLayoutParams().match())
         fragmentContainerView.addView(fragment)
 
-        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-        insetsController.isAppearanceLightStatusBars = true
-        insetsController.isAppearanceLightNavigationBars = true
         WindowCompat.setDecorFitsSystemWindows(window, false)
         ViewCompat.setOnApplyWindowInsetsListener(fragmentContainerView) { _, windowInsets ->
             val systemBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            fragmentContainerView.setTag(R.id.system_bar_insets, systemBarsInsets.top to systemBarsInsets.bottom)
+            ThemeManager.changeInsets(systemBarsInsets.intoThemeInsets())
 
-            windowInsets
-            //WindowInsetsCompat.CONSUMED
+            WindowInsetsCompat.CONSUMED
         }
+
+        checkDarkTheme()
+
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        checkDarkTheme(newConfig)
+    }
+
+    private fun Insets.intoThemeInsets() = ThemeManager.WindowInsets(
+        start = left,
+        top = top,
+        end = right,
+        bottom = bottom
+    )
+
+    private fun checkDarkTheme(configuration: Configuration = resources.configuration) {
+        val isDarkTheme = (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        ThemeManager.changeTheme(if (isDarkTheme) CoreTheme.DARK else CoreTheme.LIGHT)
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        insetsController.isAppearanceLightStatusBars = !isDarkTheme
+        insetsController.isAppearanceLightNavigationBars = !isDarkTheme
     }
 
 }

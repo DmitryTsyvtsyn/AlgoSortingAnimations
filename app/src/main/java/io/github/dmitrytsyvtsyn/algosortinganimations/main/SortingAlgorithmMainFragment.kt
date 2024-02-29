@@ -1,19 +1,16 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.text.TextUtils
-import android.view.Gravity
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.view.WindowInsets
-import android.widget.LinearLayout
 import android.widget.ScrollView
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreButton
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreFrameLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreImageButtonView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreLinearLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreSeekBar
@@ -31,6 +28,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.main.customview.SortingAlg
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs.SortingNewArrayActionsDialog
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAnimationButtonState
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.views.ComplexityView
 import io.github.dmitrytsyvtsyn.algosortinganimations.selection.SortingAlgorithmSelectionFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,10 +55,12 @@ class SortingAlgorithmMainFragment(
         }
         addView(toolbarView)
 
-        val backgroundColor = 0xffe7e7e7.toInt()
-        val sortingContentView = LinearLayout(context)
+        val sortingContentView = object : CoreLinearLayout(context) {
+            override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {
+                setBackgroundColor(theme.colors[ColorAttributes.secondaryBackgroundColor])
+            }
+        }
         sortingContentView.orientation = VERTICAL
-        sortingContentView.setBackgroundColor(backgroundColor)
         sortingContentView.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
             .marginTop(context.dp(16)))
         addView(sortingContentView)
@@ -199,7 +199,7 @@ class SortingAlgorithmMainFragment(
                     worstSpaceComplexityView.changeDescription(worstSpaceComplexity)
                 }
 
-                sortingAlgorithmView.changeArray(state.elements)
+                sortingAlgorithmView.changeArray(state.arrayCopy)
                 sortingAlgorithmView.changeAnimationSteps(state.steps(resources))
             }
         }
@@ -225,47 +225,10 @@ class SortingAlgorithmMainFragment(
 
     }
 
-    override fun onApplyWindowInsets(insets: WindowInsets?): WindowInsets {
-        val (top, bottom) = parent.getTag(R.id.system_bar_insets) as Pair<Int, Int>
-        padding(top = top, bottom = bottom)
+    override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {
+        super.onThemeChanged(insets, theme)
 
-        return super.onApplyWindowInsets(insets)
-    }
-
-    class ComplexityView(ctx: Context) : CoreFrameLayout(ctx) {
-
-        private val complexityTitleView = CoreTextView(
-            ctx = context,
-            textStyle = TypefaceAttribute.Body1
-        )
-
-        private val complexityDescriptionView = CoreTextView(
-            ctx = context,
-            textStyle = TypefaceAttribute.Title2
-        )
-
-        init {
-            padding(start = context.dp(16), end = context.dp(16))
-
-            complexityTitleView.layoutParams(frameLayoutParams().wrap()
-                .gravity(Gravity.START or Gravity.CENTER_VERTICAL))
-            addView(complexityTitleView)
-
-            complexityDescriptionView.gravity = Gravity.CENTER_HORIZONTAL
-            complexityDescriptionView.layoutParams(frameLayoutParams()
-                .wrap()
-                .gravity(Gravity.END or Gravity.CENTER_VERTICAL))
-            addView(complexityDescriptionView)
-        }
-
-        fun changeTitle(title: String) {
-            complexityTitleView.text = title
-        }
-
-        fun changeDescription(description: String) {
-            complexityDescriptionView.text = description
-        }
-
+        padding(top = insets.top, bottom = insets.bottom)
     }
 
     override fun onDetachedFromWindow() {
@@ -274,3 +237,4 @@ class SortingAlgorithmMainFragment(
     }
 
 }
+

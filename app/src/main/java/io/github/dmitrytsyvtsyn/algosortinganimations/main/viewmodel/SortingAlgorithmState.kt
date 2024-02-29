@@ -9,11 +9,11 @@ class SortingAlgorithmState(
     val selectedAlgorithm: SortingAlgorithm = BubbleSort(),
     private val sortingArray: IntArray = intArrayOf()
 ) {
-    val elements: IntArray
+    val arrayCopy: IntArray
         get() = sortingArray.copyOf()
 
     fun steps(resources: Resources): List<SortingAlgorithmStep> {
-        return selectedAlgorithm.sort(sortingArray, resources)
+        return selectedAlgorithm.sort(arrayCopy, resources)
     }
 
     fun copyWithSelectedAlgorithm(selectedAlgorithm: SortingAlgorithm) =

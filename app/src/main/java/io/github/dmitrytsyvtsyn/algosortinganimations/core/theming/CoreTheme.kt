@@ -30,6 +30,16 @@ enum class CoreTheme(
             primaryTextColor = CoreColors.black,
             selectableBackgroundColor = CoreColors.grayLight
         )
+    ),
+
+    DARK(
+        colors = Colors(
+            primaryBackgroundColor = CoreColors.black,
+            secondaryBackgroundColor = CoreColors.grayMedium,
+            disabledBackgroundColor = CoreColors.grayMedium,
+            primaryTextColor = CoreColors.white,
+            selectableBackgroundColor = CoreColors.grayLight
+        )
     )
 
 }

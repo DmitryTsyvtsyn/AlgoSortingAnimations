@@ -5,6 +5,8 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.RippleDrawable
 import android.widget.LinearLayout
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.CoreColors
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
@@ -13,15 +15,13 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.shape.ShapeTr
 
 open class CoreLinearLayout @JvmOverloads constructor(
     ctx: Context,
-    backgroundColor: ColorAttributes = ColorAttributes.primaryBackgroundColor,
-    shape: ShapeAttribute = ShapeAttribute.medium,
-    shapeTreatmentStrategy: ShapeTreatmentStrategy = ShapeTreatmentStrategy.None(),
-    rippleColor: ColorAttributes? = null,
-): LinearLayout(ctx) {
+    private val backgroundColor: ColorAttributes = ColorAttributes.primaryBackgroundColor,
+    private val shape: ShapeAttribute = ShapeAttribute.medium,
+    private val shapeTreatmentStrategy: ShapeTreatmentStrategy = ShapeTreatmentStrategy.None(),
+    private val rippleColor: ColorAttributes? = null,
+): LinearLayout(ctx), ThemeManager.ThemeManagerListener {
 
-    private val theme = io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme.LIGHT
-
-    init {
+    override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {
         val gradientDrawable = GradientDrawable()
         val radius = shapeTreatmentStrategy.floatArrayOf(context.dp(theme.shapeStyle[shape]))
         gradientDrawable.cornerRadii = radius
@@ -44,6 +44,16 @@ open class CoreLinearLayout @JvmOverloads constructor(
         } else {
             gradientDrawable
         }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        ThemeManager.addThemeListener(this)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        ThemeManager.removeThemeListener(this)
     }
 
 }

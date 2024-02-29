@@ -5,7 +5,8 @@ import android.view.Gravity
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreButton
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreLinearLayout
@@ -31,6 +32,12 @@ class SortingAlgorithmSelectionFragment(
     private val job = Job()
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
 
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            navigateBack()
+        }
+    }
+
     init {
         orientation = VERTICAL
 
@@ -40,12 +47,7 @@ class SortingAlgorithmSelectionFragment(
         toolbarView.changeBackButtonListener { navigateBack() }
         addView(toolbarView)
 
-        (context as ComponentActivity).onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                isEnabled = false
-                navigateBack()
-            }
-        })
+        (context as ComponentActivity).onBackPressedDispatcher.addCallback(callback)
 
         coroutineScope.launch {
             viewModel.algorithmListState.collect { algorithms ->
@@ -76,12 +78,18 @@ class SortingAlgorithmSelectionFragment(
             }
         }
 
-        val (top, bottom) = parent.getTag(R.id.system_bar_insets) as Pair<Int, Int>
-        padding(top = top, bottom = bottom)
-
     }
 
-    private fun navigateBack() { parent.removeView(this) }
+    private fun navigateBack() {
+        callback.isEnabled = false
+        parent.removeView(this)
+    }
+
+    override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {
+        super.onThemeChanged(insets, theme)
+
+        padding(top = insets.top, bottom = insets.bottom)
+    }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()

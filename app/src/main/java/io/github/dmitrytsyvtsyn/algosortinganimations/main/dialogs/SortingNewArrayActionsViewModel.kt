@@ -5,18 +5,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class SortingNewArrayActionsViewModel(
-    private val producer: RandomArraysProducer = RandomArraysProducer(6)
+    private val producer: RandomArraysProducer = RandomArraysProducer(6),
+    array: IntArray = producer.randomArray(6),
 ) {
 
     private val _state = MutableStateFlow(
         SortingNewArrayActionsState(
-            size = 6,
+            size = array.size,
             sizes = intArrayOf(2, 3, 4, 5, 6),
-            array = producer.randomArray(6),
+            array = array,
             sizesChanged = true
         )
     )
     val state = _state.asStateFlow()
+
+    val array: IntArray
+        get() = _state.value.array
 
     fun changeSize(size: Int) = updateState {
         copyWithChangedSize(size)

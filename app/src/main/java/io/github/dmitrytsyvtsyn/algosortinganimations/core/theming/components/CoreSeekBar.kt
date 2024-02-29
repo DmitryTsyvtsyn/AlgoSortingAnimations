@@ -6,13 +6,12 @@ import android.graphics.drawable.GradientDrawable
 import android.widget.SeekBar
 import androidx.appcompat.widget.AppCompatSeekBar
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
 import kotlin.math.roundToInt
 
-class CoreSeekBar(ctx: Context) : AppCompatSeekBar(ctx) {
-
-    private val theme = CoreTheme.LIGHT
+class CoreSeekBar(ctx: Context) : AppCompatSeekBar(ctx), ThemeManager.ThemeManagerListener {
 
     // values: 0f..1f
     fun changeProgress(progress: Float) {
@@ -31,7 +30,7 @@ class CoreSeekBar(ctx: Context) : AppCompatSeekBar(ctx) {
         })
     }
 
-    init {
+    override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {
         val color = theme.colors[ColorAttributes.primaryColor]
 
         thumb = GradientDrawable().apply {
@@ -40,6 +39,16 @@ class CoreSeekBar(ctx: Context) : AppCompatSeekBar(ctx) {
             setSize(context.dp(6), context.dp(16))
         }
         progressTintList = ColorStateList.valueOf(color)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        ThemeManager.addThemeListener(this)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        ThemeManager.removeThemeListener(this)
     }
 
 }

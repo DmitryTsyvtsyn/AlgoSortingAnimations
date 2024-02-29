@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 class SortingNewArrayActionsDialog(
     private val parent: ViewGroup,
     parentViewModel: SortingAlgorithmViewModel,
-    private val viewModel: SortingNewArrayActionsViewModel = SortingNewArrayActionsViewModel()
+    private val viewModel: SortingNewArrayActionsViewModel = SortingNewArrayActionsViewModel(array = parentViewModel.arrayCopy)
 ) : FrameLayout(parent.context) {
 
     private val job = Job()
@@ -105,7 +105,7 @@ class SortingNewArrayActionsDialog(
         )
         okButton.setText(R.string.ok)
         okButton.setOnClickListener {
-            parentViewModel.changeSortingArray(viewModel.state.value.array)
+            parentViewModel.changeSortingArray(viewModel.array)
             navigateBack()
         }
         okButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight().marginTop(context.dp(12)))
