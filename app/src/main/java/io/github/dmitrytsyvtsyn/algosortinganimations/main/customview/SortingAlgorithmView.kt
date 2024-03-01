@@ -4,11 +4,10 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.os.SystemClock
 import android.text.TextPaint
 import android.view.View
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceManager
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefacePath
 import kotlin.math.roundToInt
 
 class SortingAlgorithmView(context: Context) : View(context) {
@@ -24,18 +23,17 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
     private val tag = "SortingAlgorithmView"
 
-    private val defaultStrokeWidth = 2.5f.dpf
-    private val selectedStrokeWidth = 5f.dpf
+    private var defaultStrokeWidth = 2.5f.dpf
+    private var selectedStrokeWidth = 5f.dpf
 
-    private val defaultStrokeColor = 0xff019701.toInt()
-    private val selectedStrokeColor = 0xff015501.toInt()
+    private var defaultStrokeColor = 0xff019701.toInt()
+    private var selectedStrokeColor = 0xff015501.toInt()
 
-    private val containerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val itemPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
     }
     private val textPaint = TextPaint().apply {
         textSize = 19.sp
-        typeface = TypefaceManager.typeface(TypefacePath.MEDIUM)
     }
 
     private val isAnimationEnabled: Boolean
@@ -141,9 +139,9 @@ class SortingAlgorithmView(context: Context) : View(context) {
             val strokeWidth = state.animatedStrokeWidth(selectionAnimationFraction)
             val strokeWidthHalf = strokeWidth / 2
             val strokeColor = state.strokeColor()
-            containerPaint.color = strokeColor
-            containerPaint.strokeWidth = strokeWidth
-            canvas.drawRoundRect(start + strokeWidthHalf, top + strokeWidthHalf, start + itemSize - strokeWidthHalf, top + itemSize - strokeWidthHalf, radius, radius, containerPaint)
+            itemPaint.color = strokeColor
+            itemPaint.strokeWidth = strokeWidth
+            canvas.drawRoundRect(start + strokeWidthHalf, top + strokeWidthHalf, start + itemSize - strokeWidthHalf, top + itemSize - strokeWidthHalf, radius, radius, itemPaint)
 
             val text = state.title
             val textWidth = textPaint.measureText(text)
@@ -173,6 +171,28 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 handleStep()
             }
         }
+    }
+
+    fun changeParams(
+        strokeWidth: Float = this.defaultStrokeWidth,
+        selectedStrokeWidth: Float = this.selectedStrokeWidth,
+        strokeColor: Int = this.defaultStrokeColor,
+        selectedStrokeColor: Int = this.selectedStrokeColor,
+        textColor: Int = this.textPaint.color,
+        textSize: Float = this.textPaint.textSize,
+        typeface: Typeface = this.textPaint.typeface
+    ) {
+        this.defaultStrokeWidth = strokeWidth
+        this.selectedStrokeWidth = selectedStrokeWidth
+
+        this.defaultStrokeColor = strokeColor
+        this.selectedStrokeColor = selectedStrokeColor
+
+        this.textPaint.color = textColor
+        this.textPaint.textSize = textSize
+        this.textPaint.typeface = typeface
+
+        invalidate()
     }
 
     // values: 0f..1f

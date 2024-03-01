@@ -2,7 +2,9 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.BlendMode
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.widget.SeekBar
 import androidx.appcompat.widget.AppCompatSeekBar
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
@@ -39,6 +41,10 @@ class CoreSeekBar(ctx: Context) : AppCompatSeekBar(ctx), ThemeManager.ThemeManag
             setSize(context.dp(6), context.dp(16))
         }
         progressTintList = ColorStateList.valueOf(color)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            progressBackgroundTintBlendMode = BlendMode.COLOR
+        }
+        progressBackgroundTintList = ColorStateList.valueOf(theme.colors[ColorAttributes.selectableBackgroundColor])
     }
 
     override fun onAttachedToWindow() {

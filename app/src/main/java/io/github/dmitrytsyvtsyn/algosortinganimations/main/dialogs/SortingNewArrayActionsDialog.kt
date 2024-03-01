@@ -9,6 +9,7 @@ import android.widget.RadioGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.CoreColors
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreButton
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreLinearLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreRadioButton
@@ -37,7 +38,7 @@ class SortingNewArrayActionsDialog(
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
 
     private val IntArray.string
-        get() = joinToString(prefix = "[ ", postfix = " ]", separator = ", ") { "$it" }
+        get() = joinToString(prefix = "[  ", postfix = "  ]", separator = "   ") { "$it" }
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -46,7 +47,7 @@ class SortingNewArrayActionsDialog(
     }
 
     init {
-        setBackgroundColor(0x55_55_55_55)
+        setBackgroundColor(CoreColors.grayTranslucent)
         setOnClickListener {
             navigateBack()
         }

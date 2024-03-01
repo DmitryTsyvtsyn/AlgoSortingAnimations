@@ -24,6 +24,8 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.pa
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.viewGroupLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.shape.ShapeTreatmentStrategy
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceAttribute
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceManager
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefacePath
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.customview.SortingAlgorithmView
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs.SortingNewArrayActionsDialog
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
@@ -43,6 +45,8 @@ class SortingAlgorithmMainFragment(
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
+
+    private val sortingAlgorithmView = SortingAlgorithmView(context)
 
     init {
         orientation = VERTICAL
@@ -65,7 +69,6 @@ class SortingAlgorithmMainFragment(
             .marginTop(context.dp(16)))
         addView(sortingContentView)
 
-        val sortingAlgorithmView = SortingAlgorithmView(context)
         sortingAlgorithmView.layoutParams(linearLayoutParams().matchWidth().wrapHeight())
         sortingContentView.addView(sortingAlgorithmView)
 
@@ -227,6 +230,13 @@ class SortingAlgorithmMainFragment(
 
     override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {
         super.onThemeChanged(insets, theme)
+
+        sortingAlgorithmView.changeParams(
+            strokeColor = theme.colors[ColorAttributes.primaryColor],
+            selectedStrokeColor = theme.colors[ColorAttributes.primaryDarkColor],
+            textColor = theme.colors[ColorAttributes.primaryTextColor],
+            typeface = TypefaceManager.typeface(TypefacePath.MEDIUM)
+        )
 
         padding(top = insets.top, bottom = insets.bottom)
     }

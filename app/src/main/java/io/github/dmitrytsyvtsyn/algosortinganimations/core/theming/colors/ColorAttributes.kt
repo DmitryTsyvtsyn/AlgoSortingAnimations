@@ -7,7 +7,7 @@ enum class ColorAttributes {
     primaryBackgroundColor,
     secondaryBackgroundColor,
     disabledBackgroundColor,
-    primaryTextColor,
     selectableBackgroundColor,
+    primaryTextColor,
     transparent
 }
