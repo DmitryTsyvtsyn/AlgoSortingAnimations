@@ -9,8 +9,11 @@ import android.widget.RadioGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.CoreColors
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreButton
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreFrameLayout
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreImageButtonView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreLinearLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreRadioButton
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreTextView
@@ -19,6 +22,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.fr
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.linearLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.padding
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.shape.ShapeAttribute
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.shape.ShapeTreatmentStrategy
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceAttribute
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
@@ -52,6 +56,8 @@ class SortingNewArrayActionsDialog(
             navigateBack()
         }
 
+        val marginMedium = context.dp(16)
+
         val contentView = CoreLinearLayout(
             ctx = context,
             shapeTreatmentStrategy = ShapeTreatmentStrategy.AllRounded()
@@ -59,31 +65,79 @@ class SortingNewArrayActionsDialog(
         contentView.isClickable = true
         contentView.orientation = LinearLayout.VERTICAL
         contentView.elevation = context.dp(8f)
-        contentView.padding(horizontal = context.dp(12), vertical = context.dp(16))
+        contentView.padding(bottom = marginMedium)
         contentView.layoutParams(frameLayoutParams().matchWidth().wrapHeight()
             .margins(context.dp(24))
             .gravity(Gravity.CENTER))
         addView(contentView)
+
+        val titleContentView = CoreFrameLayout(
+            ctx = context,
+            backgroundColor = ColorAttributes.transparent
+        )
+        titleContentView.layoutParams(linearLayoutParams().matchWidth().wrapHeight())
+        contentView.addView(titleContentView)
+
+        val titleView = CoreTextView(
+            ctx = context,
+            textStyle = TypefaceAttribute.Title1
+        )
+        titleView.setText(R.string.new_array)
+        titleView.layoutParams(frameLayoutParams().wrap().gravity(Gravity.START)
+            .marginStart(marginMedium).marginTop(marginMedium))
+        titleContentView.addView(titleView)
+
+        val size = context.dp(48)
+        val closeView = CoreImageButtonView(
+            ctx = context,
+            shape = ShapeAttribute.medium,
+            shapeTreatmentStrategy = ShapeTreatmentStrategy.StartBottomTopEndRounded()
+        )
+        closeView.setOnClickListener { navigateBack() }
+        closeView.padding(context.dp(12))
+        closeView.setImageResource(R.drawable.ic_close)
+        closeView.layoutParams(frameLayoutParams().width(size).height(size).gravity(Gravity.END))
+        titleContentView.addView(closeView)
 
         val arrayExampleView = CoreTextView(
             ctx = context,
             textStyle = TypefaceAttribute.Title2
         )
         arrayExampleView.gravity = Gravity.CENTER
-        arrayExampleView.layoutParams(linearLayoutParams().matchWidth().wrapHeight())
+        arrayExampleView.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
+            .marginTop(context.dp(24))
+            .marginStart(marginMedium)
+            .marginEnd(marginMedium))
         contentView.addView(arrayExampleView)
 
-        val arraySizesView = RadioGroup(context)
-        arraySizesView.orientation = LinearLayout.HORIZONTAL
-        arraySizesView.layoutParams(linearLayoutParams().matchWidth().wrapHeight().marginTop(context.dp(24)))
-        contentView.addView(arraySizesView)
+        val arraySizesTitleView = CoreTextView(
+            ctx = context,
+            textStyle = TypefaceAttribute.Body1
+        )
+        arraySizesTitleView.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
+            .marginTop(context.dp(24))
+            .marginStart(marginMedium)
+            .marginEnd(marginMedium))
+        arraySizesTitleView.setText(R.string.array_size)
+        contentView.addView(arraySizesTitleView)
+
+        val arraySizesContentView = RadioGroup(context)
+        arraySizesContentView.orientation = LinearLayout.HORIZONTAL
+        arraySizesContentView.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
+            .marginTop(context.dp(16))
+            .marginStart(marginMedium)
+            .marginEnd(marginMedium))
+        contentView.addView(arraySizesContentView)
 
         val generateRandomArrayButton = CoreButton(
             ctx = context,
             shapeTreatmentStrategy = ShapeTreatmentStrategy.AllRounded()
         )
-        generateRandomArrayButton.setText(R.string.random_array)
-        generateRandomArrayButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight().marginTop(context.dp(24)))
+        generateRandomArrayButton.setText(R.string.random)
+        generateRandomArrayButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
+            .marginTop(context.dp(24))
+            .marginStart(marginMedium)
+            .marginEnd(marginMedium))
         generateRandomArrayButton.setOnClickListener {
             viewModel.generateRandomArray()
         }
@@ -93,8 +147,11 @@ class SortingNewArrayActionsDialog(
             ctx = context,
             shapeTreatmentStrategy = ShapeTreatmentStrategy.AllRounded()
         )
-        generateSortedArrayButton.setText(R.string.sorted_array)
-        generateSortedArrayButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight().marginTop(context.dp(12)))
+        generateSortedArrayButton.setText(R.string.sorted)
+        generateSortedArrayButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
+            .marginTop(context.dp(12))
+            .marginStart(marginMedium)
+            .marginEnd(marginMedium))
         generateSortedArrayButton.setOnClickListener {
             viewModel.generateSortedArray()
         }
@@ -109,7 +166,10 @@ class SortingNewArrayActionsDialog(
             parentViewModel.changeSortingArray(viewModel.array)
             navigateBack()
         }
-        okButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight().marginTop(context.dp(12)))
+        okButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
+            .marginTop(context.dp(12))
+            .marginStart(marginMedium)
+            .marginEnd(marginMedium))
         contentView.addView(okButton)
 
         (context as ComponentActivity).onBackPressedDispatcher.addCallback(callback)
@@ -118,7 +178,7 @@ class SortingNewArrayActionsDialog(
             viewModel.state.collect { state ->
                 arrayExampleView.text = state.array.string
                 if (state.sizesChanged) {
-                    arraySizesView.removeAllViews()
+                    arraySizesContentView.removeAllViews()
                     state.sizes.forEachIndexed { index, size ->
                         val button = CoreRadioButton(context)
                         button.text = size.toString()
@@ -132,11 +192,11 @@ class SortingNewArrayActionsDialog(
                         val margin = if (index > 0) context.dp(8) else 0
                         button.layoutParams(linearLayoutParams().wrap().marginStart(margin))
 
-                        arraySizesView.addView(button)
+                        arraySizesContentView.addView(button)
                     }
                 } else {
                     state.sizes.forEachIndexed { index, size ->
-                        val button = arraySizesView.getChildAt(index) as CoreRadioButton
+                        val button = arraySizesContentView.getChildAt(index) as CoreRadioButton
                         button.isChecked = size == state.size
                     }
                 }

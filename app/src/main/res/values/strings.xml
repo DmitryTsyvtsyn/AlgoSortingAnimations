@@ -16,7 +16,8 @@
     <string name="swaping_numbers">Меняем местами %1$d и %2$d потому что число %3$d больше числа %4$d</string>
     <string name="numbers_are_ordered">Числа %1$d и %2$d следуют в правильном порядке</string>
     <string name="numbers_was_replaced">Числа %1$d и %2$d успешно поменялись местами</string>
-    <string name="random_array">Random array</string>
-    <string name="sorted_array">Sorted array</string>
+    <string name="random">Random</string>
+    <string name="sorted">Sorted</string>
     <string name="ok">OK</string>
+    <string name="array_size">Array size:</string>
 </resources>
