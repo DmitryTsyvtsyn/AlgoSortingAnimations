@@ -20,4 +20,5 @@
     <string name="sorted">Sorted</string>
     <string name="ok">OK</string>
     <string name="array_size">Array size:</string>
+    <string name="sorting_algorithms">Sorting algorithms</string>
 </resources>

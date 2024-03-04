@@ -2,6 +2,7 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.AbstractLP
 import kotlin.math.roundToInt
 
@@ -23,4 +24,11 @@ fun View.padding(all: Int) {
 
 fun View.layoutParams(params: AbstractLP<*, *>) {
     layoutParams = params.build()
+}
+
+fun ViewGroup.removeLast() {
+    val size = childCount
+    if (size > 0) {
+        removeViewAt(size - 1)
+    }
 }

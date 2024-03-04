@@ -1,5 +1,6 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs
 
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.CoreViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.RandomArraysProducer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -7,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class SortingNewArrayActionsViewModel(
     private val producer: RandomArraysProducer = RandomArraysProducer(6),
     array: IntArray = producer.randomArray(6),
-) {
+) : CoreViewModel {
 
     private val _state = MutableStateFlow(
         SortingNewArrayActionsState(

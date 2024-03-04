@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="system_bar_insets" type="id" />
+    <item name="navigation_stack" type="id" />
 </resources>

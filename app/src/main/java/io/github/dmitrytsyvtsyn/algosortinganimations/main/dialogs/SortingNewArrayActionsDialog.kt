@@ -2,13 +2,11 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs
 
 import android.annotation.SuppressLint
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RadioGroup
-import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.BaseFragmentParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.CoreColors
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreButton
@@ -32,29 +30,23 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @SuppressLint("ViewConstructor")
-class SortingNewArrayActionsDialog(
-    private val parent: ViewGroup,
-    parentViewModel: SortingAlgorithmViewModel,
-    private val viewModel: SortingNewArrayActionsViewModel = SortingNewArrayActionsViewModel(array = parentViewModel.arrayCopy)
-) : FrameLayout(parent.context) {
+class SortingNewArrayActionsDialog(params: BaseFragmentParams) : FrameLayout(params.context) {
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
 
+    private val navigator = params.navigator
+    private val parentViewModel = params.viewModelProvider.provide(SortingAlgorithmViewModel::class.java)
+    private val viewModel = params.viewModelProvider.provide(SortingNewArrayActionsViewModel::class.java) {
+        SortingNewArrayActionsViewModel(array = parentViewModel.arrayCopy)
+    }
+
     private val IntArray.string
         get() = joinToString(prefix = "[  ", postfix = "  ]", separator = "   ") { "$it" }
 
-    private val callback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            navigateBack()
-        }
-    }
-
     init {
         setBackgroundColor(CoreColors.grayTranslucent)
-        setOnClickListener {
-            navigateBack()
-        }
+        setOnClickListener { navigator.navigateBack() }
 
         val marginMedium = context.dp(16)
 
@@ -93,7 +85,7 @@ class SortingNewArrayActionsDialog(
             shape = ShapeAttribute.medium,
             shapeTreatmentStrategy = ShapeTreatmentStrategy.StartBottomTopEndRounded()
         )
-        closeView.setOnClickListener { navigateBack() }
+        closeView.setOnClickListener { navigator.navigateBack() }
         closeView.padding(context.dp(12))
         closeView.setImageResource(R.drawable.ic_close)
         closeView.layoutParams(frameLayoutParams().width(size).height(size).gravity(Gravity.END))
@@ -164,15 +156,13 @@ class SortingNewArrayActionsDialog(
         okButton.setText(R.string.ok)
         okButton.setOnClickListener {
             parentViewModel.changeSortingArray(viewModel.array)
-            navigateBack()
+            navigator.navigateBack()
         }
         okButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
             .marginTop(context.dp(12))
             .marginStart(marginMedium)
             .marginEnd(marginMedium))
         contentView.addView(okButton)
-
-        (context as ComponentActivity).onBackPressedDispatcher.addCallback(callback)
 
         coroutineScope.launch {
             viewModel.state.collect { state ->
@@ -203,11 +193,6 @@ class SortingNewArrayActionsDialog(
             }
         }
 
-    }
-
-    private fun navigateBack() {
-        callback.isEnabled = false
-        parent.removeView(this)
     }
 
     override fun onDetachedFromWindow() {

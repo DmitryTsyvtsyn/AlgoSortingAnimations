@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.text.TextUtils
 import android.view.View
 import android.view.View.OnClickListener
-import android.view.ViewGroup
 import android.widget.ScrollView
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.BaseFragmentParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
@@ -38,14 +38,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @SuppressLint("ViewConstructor")
-class SortingAlgorithmMainFragment(
-    private val parent: ViewGroup,
-    viewModel: SortingAlgorithmViewModel
-) : CoreLinearLayout(parent.context) {
+class SortingAlgorithmMainFragment(params: BaseFragmentParams) : CoreLinearLayout(params.context) {
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
 
+    private val navigator = params.navigator
+    private val viewModel = params.viewModelProvider.provide(SortingAlgorithmViewModel::class.java) {
+        SortingAlgorithmViewModel()
+    }
     private val sortingAlgorithmView = SortingAlgorithmView(context)
 
     init {
@@ -55,7 +56,7 @@ class SortingAlgorithmMainFragment(
         toolbarView.layoutParams(frameLayoutParams().matchWidth().height(context.dp(48)))
         toolbarView.changeMenuButtonDrawable(R.drawable.ic_settings)
         toolbarView.changeMenuClickListener {
-            parent.addView(SortingAlgorithmSelectionFragment(parent, viewModel))
+            navigator.navigateForward(::SortingAlgorithmSelectionFragment)
         }
         addView(toolbarView)
 
@@ -136,7 +137,7 @@ class SortingAlgorithmMainFragment(
         )
         randomArrayButton.setText(R.string.new_array)
         randomArrayButton.setOnClickListener {
-            parent.addView(SortingNewArrayActionsDialog(parent, viewModel))
+            navigator.navigateForward(::SortingNewArrayActionsDialog)
         }
         randomArrayButton.layoutParams(linearLayoutParams().wrap()
             .marginStart(context.dp(12))

@@ -4,11 +4,13 @@ org-jetbrains-kotlin-android = "1.9.0"
 core-ktx = "1.9.0"
 junit = "4.13.2"
 appcompat = "1.6.1"
+coroutines = "1.8.0"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+org-jetbrains-kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines"}
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

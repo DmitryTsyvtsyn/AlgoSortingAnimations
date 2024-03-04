@@ -1,5 +1,6 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel
 
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.CoreViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.BubbleSort
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.BubbleSortImproved
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.RandomArraysProducer
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class SortingAlgorithmViewModel(
     producer: RandomArraysProducer = RandomArraysProducer(6)
-) {
+) : CoreViewModel {
 
     private val _algorithmListState = MutableStateFlow(listOf(
         BubbleSort(),

@@ -9,15 +9,16 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
-import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreFrameLayout
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.frameLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.viewGroupLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.SortingAlgorithmMainFragment
+import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity() {
+
+    private var navigator by Delegates.notNull<Navigator>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +29,12 @@ class MainActivity : AppCompatActivity() {
         fragmentContainerView.layoutParams(viewGroupLayoutParams().match())
         setContentView(fragmentContainerView)
 
-        val fragment = SortingAlgorithmMainFragment(fragmentContainerView, SortingAlgorithmViewModel())
-        fragment.layoutParams(frameLayoutParams().match())
-        fragmentContainerView.addView(fragment)
+
+
+        val navigator = Navigator(fragmentContainerView, ViewModelProvider(), onBackPressedDispatcher)
+        this.navigator = navigator
+
+        navigator.navigateForward(::SortingAlgorithmMainFragment, isAddToBackStack = false)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         ViewCompat.setOnApplyWindowInsetsListener(fragmentContainerView) { _, windowInsets ->
@@ -42,12 +46,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkDarkTheme()
-
+        navigator.onRestoreBackStack((application as App).cache)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         checkDarkTheme(newConfig)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        navigator.onSaveBackStack((application as App).cache)
     }
 
     private fun Insets.intoThemeInsets() = ThemeManager.WindowInsets(
