@@ -1,19 +1,22 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.BlendMode
+import android.graphics.drawable.ClipDrawable
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
+import android.graphics.drawable.LayerDrawable
+import android.view.Gravity
 import android.widget.SeekBar
-import androidx.appcompat.widget.AppCompatSeekBar
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.padding
 import kotlin.math.roundToInt
 
-class CoreSeekBar(ctx: Context) : AppCompatSeekBar(ctx), ThemeManager.ThemeManagerListener {
+class CoreSeekBar(ctx: Context) : SeekBar(ctx), ThemeManager.ThemeManagerListener {
+
+    init {
+        padding(0)
+    }
 
     // values: 0f..1f
     fun changeProgress(progress: Float) {
@@ -33,18 +36,27 @@ class CoreSeekBar(ctx: Context) : AppCompatSeekBar(ctx), ThemeManager.ThemeManag
     }
 
     override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {
-        val color = theme.colors[ColorAttributes.primaryColor]
+        thumb = null
+        background = null
 
-        thumb = GradientDrawable().apply {
-            setColor(color)
-            cornerRadius = context.dp(4f)
-            setSize(context.dp(6), context.dp(16))
-        }
-        progressTintList = ColorStateList.valueOf(color)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            progressBackgroundTintBlendMode = BlendMode.COLOR
-        }
-        progressBackgroundTintList = ColorStateList.valueOf(theme.colors[ColorAttributes.selectableBackgroundColor])
+        val layerDrawables = LayerDrawable(arrayOf(
+            GradientDrawable().apply {
+                setColor(theme.colors[ColorAttributes.selectableBackgroundColor])
+            },
+            ClipDrawable(
+                GradientDrawable().apply {
+                    setColor(theme.colors[ColorAttributes.primaryColor],)
+                    setSize(-1, measuredHeight)
+                },
+                Gravity.START,
+                ClipDrawable.HORIZONTAL
+            )
+        ))
+
+        layerDrawables.setId(0, android.R.id.background)
+        layerDrawables.setId(1, android.R.id.progress)
+
+        progressDrawable = layerDrawables
     }
 
     override fun onAttachedToWindow() {

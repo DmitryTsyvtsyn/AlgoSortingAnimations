@@ -3,7 +3,7 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
-import androidx.appcompat.widget.AppCompatRadioButton
+import android.widget.RadioButton
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
@@ -15,7 +15,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.font
 class CoreRadioButton(
     ctx: Context,
     private val textStyle: TypefaceAttribute = TypefaceAttribute.Body1
-) : AppCompatRadioButton(ctx), ThemeManager.ThemeManagerListener {
+) : RadioButton(ctx), ThemeManager.ThemeManagerListener {
 
     init {
         includeFontPadding = false

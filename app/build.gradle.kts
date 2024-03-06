@@ -37,7 +37,6 @@ android {
 
 dependencies {
     implementation(libs.core.ktx)
-    implementation(libs.appcompat)
     implementation(libs.org.jetbrains.kotlin.coroutines)
     testImplementation(libs.junit)
 }

@@ -4,7 +4,8 @@ class SortingNewArrayActionsState(
     val size: Int = 0,
     val sizes: IntArray = intArrayOf(),
     val array: IntArray = intArrayOf(),
-    val sizesChanged: Boolean = false
+    val sizesChanged: Boolean = false,
+    val backNavigated: Boolean = false
 ) {
 
     fun copyWithChangedSize(size: Int): SortingNewArrayActionsState {
@@ -34,6 +35,14 @@ class SortingNewArrayActionsState(
         sizes = sizes,
         array = array,
         sizesChanged = false
+    )
+
+    fun copyWithNavigatedBack(backNavigated: Boolean) = SortingNewArrayActionsState(
+        size = size,
+        sizes = sizes,
+        array = array,
+        sizesChanged = sizesChanged,
+        backNavigated = backNavigated
     )
 
 }

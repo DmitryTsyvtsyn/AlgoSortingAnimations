@@ -1,6 +1,6 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel
 
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.CoreViewModel
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.CoreViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.BubbleSort
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.BubbleSortImproved
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.RandomArraysProducer

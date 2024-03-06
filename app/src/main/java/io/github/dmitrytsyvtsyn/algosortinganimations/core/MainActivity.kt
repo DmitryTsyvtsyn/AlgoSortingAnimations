@@ -1,24 +1,39 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.core
 
+import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator.Navigator
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator.OnBackPressedDispatcher
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreFrameLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.viewGroupLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceManager
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.ViewModelProvider
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.SortingAlgorithmMainFragment
 import kotlin.properties.Delegates
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
     private var navigator by Delegates.notNull<Navigator>()
+
+    private val backPressedDispatcher = OnBackPressedDispatcher {
+        try {
+            super.onBackPressed()
+        } catch (e: IllegalStateException) {
+            // Calling onBackPressed() on an Activity with its state saved can cause an
+            // error on devices on API levels before 26
+            if (e.message != "Can not perform this action after onSaveInstanceState") {
+                throw e
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +44,11 @@ class MainActivity : AppCompatActivity() {
         fragmentContainerView.layoutParams(viewGroupLayoutParams().match())
         setContentView(fragmentContainerView)
 
+        if (BuildCompat.isAtLeastT()) {
+            backPressedDispatcher.changeOnBackInvokedDispatcher(onBackInvokedDispatcher)
+        }
 
-
-        val navigator = Navigator(fragmentContainerView, ViewModelProvider(), onBackPressedDispatcher)
+        val navigator = Navigator(fragmentContainerView, ViewModelProvider(), backPressedDispatcher)
         this.navigator = navigator
 
         navigator.navigateForward(::SortingAlgorithmMainFragment, isAddToBackStack = false)
@@ -48,6 +65,8 @@ class MainActivity : AppCompatActivity() {
         checkDarkTheme()
         navigator.onRestoreBackStack((application as App).cache)
     }
+
+    override fun onBackPressed() { backPressedDispatcher.onBackPressed() }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)

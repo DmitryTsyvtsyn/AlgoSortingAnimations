@@ -1,10 +1,10 @@
-package io.github.dmitrytsyvtsyn.algosortinganimations.core
+package io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.data.MemoryIDIdentityCache
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.ViewModelProvider
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.removeLast
 
 class Navigator(
@@ -21,7 +21,7 @@ class Navigator(
     private val stackId = R.id.navigation_stack
 
     fun navigateForward(event: NavigationScreen, isAddToBackStack: Boolean = true) {
-        val view = event.view(BaseFragmentParams(parent.context, this, viewModelProvider))
+        val view = event.view(BaseParams(parent.context, this, viewModelProvider))
         parent.addView(view)
 
         if (isAddToBackStack) {
@@ -35,12 +35,12 @@ class Navigator(
 
         parent.removeLast()
         stack.removeLast()
-        callbacks.removeLast().isEnabled = false
+        callbacks.removeLast().changeIsEnabled(false)
 
         return true
     }
 
-    fun onRestoreBackStack(cache: MemoryCache) {
+    fun onRestoreBackStack(cache: MemoryIDIdentityCache) {
         val cachedStack = cache.read<MutableList<NavigationScreen>>(stackId) ?: return
         cache.remove(stackId)
 
@@ -55,8 +55,8 @@ class Navigator(
         }
     }
 
-    fun onSaveBackStack(cache: MemoryCache) {
-        callbacks.forEach { it.isEnabled = false }
+    fun onSaveBackStack(cache: MemoryIDIdentityCache) {
+        callbacks.forEach { it.changeIsEnabled(false) }
 
         cache.save(stackId, stack)
     }
@@ -72,7 +72,7 @@ class Navigator(
     }
 
     fun interface NavigationScreen {
-        fun view(params: BaseFragmentParams): View
+        fun view(params: BaseParams): View
     }
 
 }

@@ -1,6 +1,4 @@
-package io.github.dmitrytsyvtsyn.algosortinganimations.core
-
-interface CoreViewModel
+package io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel
 
 class ViewModelProvider {
 
@@ -19,6 +17,10 @@ class ViewModelProvider {
         val viewModel = factory.invoke()
         cache[key] = viewModel
         return viewModel
+    }
+
+    fun <T : CoreViewModel> clear(viewModelClass: Class<T>) {
+        cache.remove(key(viewModelClass))
     }
 
     private fun <T> key(viewModelClass: Class<T>): String =

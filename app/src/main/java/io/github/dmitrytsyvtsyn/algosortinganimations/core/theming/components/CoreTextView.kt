@@ -1,7 +1,7 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components
 
 import android.content.Context
-import androidx.appcompat.widget.AppCompatTextView
+import android.widget.TextView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.fontSize
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
@@ -13,7 +13,7 @@ open class CoreTextView @JvmOverloads constructor(
     ctx: Context,
     private val textColor: ColorAttributes = ColorAttributes.primaryTextColor,
     private val textStyle: TypefaceAttribute = TypefaceAttribute.Body1
-): AppCompatTextView(ctx), ThemeManager.ThemeManagerListener {
+): TextView(ctx), ThemeManager.ThemeManagerListener {
 
     init {
         includeFontPadding = false

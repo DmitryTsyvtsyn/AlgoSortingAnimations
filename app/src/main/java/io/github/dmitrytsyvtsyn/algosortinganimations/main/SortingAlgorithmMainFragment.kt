@@ -6,7 +6,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.widget.ScrollView
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.BaseFragmentParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator.BaseParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
@@ -38,7 +38,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @SuppressLint("ViewConstructor")
-class SortingAlgorithmMainFragment(params: BaseFragmentParams) : CoreLinearLayout(params.context) {
+class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params.context) {
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
@@ -88,12 +88,13 @@ class SortingAlgorithmMainFragment(params: BaseFragmentParams) : CoreLinearLayou
 
         val progressView = CoreSeekBar(context)
         progressView.changeProgressListener(sortingAlgorithmView::changeAnimationProgress)
-        progressView.layoutParams(linearLayoutParams().matchWidth().height(context.dp(40)))
+        progressView.layoutParams(linearLayoutParams().matchWidth().height(context.dp(24)))
         sortingContentView.addView(progressView)
 
         val controlButtonsView = CoreLinearLayout(context, backgroundColor = ColorAttributes.transparent)
         controlButtonsView.orientation = HORIZONTAL
         controlButtonsView.padding(bottom = context.dp(8))
+        controlButtonsView.layoutParams(linearLayoutParams().matchWidth().wrapHeight().marginTop(context.dp(12)))
         sortingContentView.addView(controlButtonsView)
 
         val iconSize = context.dp(40)

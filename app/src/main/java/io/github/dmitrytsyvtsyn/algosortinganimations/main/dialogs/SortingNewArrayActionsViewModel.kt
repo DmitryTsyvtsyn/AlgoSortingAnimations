@@ -1,6 +1,6 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs
 
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.CoreViewModel
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.CoreViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.RandomArraysProducer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +33,10 @@ class SortingNewArrayActionsViewModel(
 
     fun generateSortedArray() = updateState {
         copyWithChangedArray(producer.randomArray(size).sortedArray())
+    }
+
+    fun navigateBack() = updateState {
+        copyWithNavigatedBack(backNavigated = true)
     }
 
     private inline fun updateState(newState: SortingNewArrayActionsState.() -> SortingNewArrayActionsState) {

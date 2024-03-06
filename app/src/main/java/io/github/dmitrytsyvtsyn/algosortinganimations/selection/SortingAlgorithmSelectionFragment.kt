@@ -3,7 +3,7 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.selection
 import android.annotation.SuppressLint
 import android.view.Gravity
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.BaseFragmentParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator.BaseParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
@@ -23,7 +23,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @SuppressLint("ViewConstructor")
-class SortingAlgorithmSelectionFragment(params: BaseFragmentParams) : CoreLinearLayout(params.context) {
+class SortingAlgorithmSelectionFragment(params: BaseParams) : CoreLinearLayout(params.context) {
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
