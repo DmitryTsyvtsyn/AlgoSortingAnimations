@@ -2,13 +2,22 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_param
 
 import android.widget.FrameLayout
 
-private const val match = FrameLayout.LayoutParams.MATCH_PARENT
-private const val wrap = FrameLayout.LayoutParams.WRAP_CONTENT
+fun frameLayoutParams(): AbstractFrameLayoutLP = FrameLayoutLP()
 
-class FrameLayoutLP(private val params: FrameLayout.LayoutParams = FrameLayout.LayoutParams(match, wrap)) : AbstractMarginLP<FrameLayout.LayoutParams, FrameLayoutLP>(params, match, wrap) {
+abstract class AbstractFrameLayoutLP(
+    params: FrameLayout.LayoutParams = FrameLayout.LayoutParams(match, wrap)
+) : AbstractMarginLP<FrameLayout.LayoutParams, AbstractFrameLayoutLP>(params, match, wrap) {
 
-    fun gravity(grav: Int) = FrameLayoutLP(params.apply { gravity = grav })
+    override fun applyParams(block: AbstractFrameLayoutLP.() -> Unit) = apply(block)
 
-    override fun with(params: FrameLayout.LayoutParams): FrameLayoutLP = FrameLayoutLP(params)
+    fun gravity(gravity: Int) = applyParams {
+        params.gravity = gravity
+    }
 
+    companion object {
+        private const val match = FrameLayout.LayoutParams.MATCH_PARENT
+        private const val wrap = FrameLayout.LayoutParams.WRAP_CONTENT
+    }
 }
+
+private class FrameLayoutLP : AbstractFrameLayoutLP()

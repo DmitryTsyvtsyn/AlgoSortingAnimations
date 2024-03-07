@@ -2,11 +2,18 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_param
 
 import android.view.ViewGroup
 
-private const val match = ViewGroup.LayoutParams.MATCH_PARENT
-private const val wrap = ViewGroup.LayoutParams.WRAP_CONTENT
+fun viewGroupLayoutParams(): AbstractViewGroupLP = ViewGroupLP()
 
-class ViewGroupLP(params: ViewGroup.LayoutParams = ViewGroup.LayoutParams(wrap, wrap)) : AbstractLP<ViewGroup.LayoutParams, ViewGroupLP>(params, match, wrap) {
+abstract class AbstractViewGroupLP(
+    params: ViewGroup.LayoutParams = ViewGroup.LayoutParams(wrap, wrap)
+) : AbstractLP<ViewGroup.LayoutParams, AbstractViewGroupLP>(params, match, wrap) {
 
-    override fun with(params: ViewGroup.LayoutParams): ViewGroupLP = ViewGroupLP(params)
+    override fun applyParams(block: AbstractViewGroupLP.() -> Unit) = apply(block)
 
+    companion object {
+        private const val match = ViewGroup.LayoutParams.MATCH_PARENT
+        private const val wrap = ViewGroup.LayoutParams.WRAP_CONTENT
+    }
 }
+
+private class ViewGroupLP : AbstractViewGroupLP()

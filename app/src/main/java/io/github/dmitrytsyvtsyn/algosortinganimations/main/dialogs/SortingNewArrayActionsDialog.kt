@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RadioGroup
+import androidx.core.view.forEach
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator.BaseParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
@@ -16,9 +17,9 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.Co
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreRadioButton
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreTextView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.frameLayoutParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.frameLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.linearLayoutParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.linearLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.padding
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.shape.ShapeAttribute
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.shape.ShapeTreatmentStrategy
@@ -164,42 +165,51 @@ class SortingNewArrayActionsDialog(params: BaseParams) : FrameLayout(params.cont
             .marginEnd(marginMedium))
         contentView.addView(okButton)
 
+        var cachedState = SortingNewArrayActionsState()
+
         coroutineScope.launch {
-            viewModel.state.collect { state ->
-                when {
-                    state.backNavigated -> {
+            viewModel.state.collect {
+
+                val state = it.difference(cachedState); cachedState = it
+
+                if (state.hasChanged(SortingNewArrayActionsState.arrayChanged)) {
+                    arrayExampleView.text = state.array.string
+                }
+
+                if (state.hasChanged(SortingNewArrayActionsState.sizesChanged)) {
+                    arraySizesContentView.removeAllViews()
+                    state.sizes.forEachIndexed { index, size ->
+                        val button = CoreRadioButton(context)
+                        button.text = size.toString()
+                        button.tag = size
+                        button.isChecked = size == state.size
+                        button.setOnCheckedChangeListener { _, isChecked ->
+                            if (isChecked) {
+                                viewModel.changeSize(size)
+                            }
+                        }
+
+                        val margin = if (index > 0) context.dp(8) else 0
+                        button.layoutParams(linearLayoutParams().wrap().marginStart(margin))
+
+                        arraySizesContentView.addView(button)
+                    }
+                }
+
+                if (state.hasChanged(SortingNewArrayActionsState.sizeChanged)) {
+                    arraySizesContentView.forEach { view ->
+                        val checkedView = view as CoreRadioButton
+                        checkedView.isChecked = checkedView.tag == state.size
+                    }
+                }
+
+                if (state.hasChanged(SortingNewArrayActionsState.backNavigatedChanged)) {
+                    if (state.backNavigated) {
                         params.viewModelProvider.clear(SortingNewArrayActionsViewModel::class.java)
                         navigator.navigateBack()
                     }
-                    state.sizesChanged -> {
-                        arrayExampleView.text = state.array.string
-
-                        arraySizesContentView.removeAllViews()
-                        state.sizes.forEachIndexed { index, size ->
-                            val button = CoreRadioButton(context)
-                            button.text = size.toString()
-                            button.isChecked = size == state.size
-                            button.setOnCheckedChangeListener { _, isChecked ->
-                                if (isChecked) {
-                                    viewModel.changeSize(size)
-                                }
-                            }
-
-                            val margin = if (index > 0) context.dp(8) else 0
-                            button.layoutParams(linearLayoutParams().wrap().marginStart(margin))
-
-                            arraySizesContentView.addView(button)
-                        }
-                    }
-                    else -> {
-                        arrayExampleView.text = state.array.string
-
-                        state.sizes.forEachIndexed { index, size ->
-                            val button = arraySizesContentView.getChildAt(index) as CoreRadioButton
-                            button.isChecked = size == state.size
-                        }
-                    }
                 }
+
             }
         }
 

@@ -13,7 +13,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreFrameLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.viewGroupLayoutParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.viewGroupLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.ViewModelProvider
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.SortingAlgorithmMainFragment
@@ -22,6 +22,7 @@ import kotlin.properties.Delegates
 class MainActivity : Activity() {
 
     private var navigator by Delegates.notNull<Navigator>()
+    private var viewModelProvider by Delegates.notNull<ViewModelProvider>()
 
     private val backPressedDispatcher = OnBackPressedDispatcher {
         try {
@@ -48,9 +49,8 @@ class MainActivity : Activity() {
             backPressedDispatcher.changeOnBackInvokedDispatcher(onBackInvokedDispatcher)
         }
 
-        val navigator = Navigator(fragmentContainerView, ViewModelProvider(), backPressedDispatcher)
-        this.navigator = navigator
-
+        viewModelProvider = lastNonConfigurationInstance as? ViewModelProvider ?: ViewModelProvider()
+        navigator = Navigator(fragmentContainerView, viewModelProvider, backPressedDispatcher)
         navigator.navigateForward(::SortingAlgorithmMainFragment, isAddToBackStack = false)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -72,6 +72,8 @@ class MainActivity : Activity() {
         super.onConfigurationChanged(newConfig)
         checkDarkTheme(newConfig)
     }
+
+    override fun onRetainNonConfigurationInstance() = viewModelProvider
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

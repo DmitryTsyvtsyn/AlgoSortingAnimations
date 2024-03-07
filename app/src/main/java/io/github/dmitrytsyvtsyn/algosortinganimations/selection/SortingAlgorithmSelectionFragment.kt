@@ -11,9 +11,9 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.Co
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreLinearLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.ToolbarView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.frameLayoutParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.frameLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.linearLayoutParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.linearLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.padding
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceAttribute
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel

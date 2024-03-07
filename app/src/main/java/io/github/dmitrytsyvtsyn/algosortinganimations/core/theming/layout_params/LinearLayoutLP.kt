@@ -2,14 +2,26 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_param
 
 import android.widget.LinearLayout
 
-private const val match = LinearLayout.LayoutParams.MATCH_PARENT
-private const val wrap = LinearLayout.LayoutParams.WRAP_CONTENT
+fun linearLayoutParams(): AbstractLinearLayoutLP = LinearLayoutLP()
 
-class LinearLayoutLP(private var params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(match, wrap)) : AbstractMarginLP<LinearLayout.LayoutParams, LinearLayoutLP>(params, match, wrap) {
+abstract class AbstractLinearLayoutLP(
+    params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(match, wrap)
+) : AbstractMarginLP<LinearLayout.LayoutParams, AbstractLinearLayoutLP>(params, match, wrap) {
 
-    fun weight(w: Float) = LinearLayoutLP(params.apply { weight = w })
-    fun gravity(grav: Int) = LinearLayoutLP(params.apply { gravity = grav })
+    override fun applyParams(block: AbstractLinearLayoutLP.() -> Unit) = apply(block)
 
-    override fun with(params: LinearLayout.LayoutParams) = LinearLayoutLP(params)
+    fun weight(weight: Float) = apply {
+        params.weight = weight
+    }
 
+    fun gravity(gravity: Int) = apply {
+        params.gravity = gravity
+    }
+
+    companion object {
+        private const val match = LinearLayout.LayoutParams.MATCH_PARENT
+        private const val wrap = LinearLayout.LayoutParams.WRAP_CONTENT
+    }
 }
+
+private class LinearLayoutLP : AbstractLinearLayoutLP()

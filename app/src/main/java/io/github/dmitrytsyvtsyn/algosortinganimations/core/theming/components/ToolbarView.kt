@@ -10,7 +10,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.R
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceAttribute
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.frameLayoutParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.frameLayoutParams
 
 class ToolbarView(ctx: Context) : CoreFrameLayout(ctx) {
 

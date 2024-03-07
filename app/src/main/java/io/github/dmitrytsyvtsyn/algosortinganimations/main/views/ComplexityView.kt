@@ -5,7 +5,7 @@ import android.view.Gravity
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreFrameLayout
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreTextView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.frameLayoutParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.frameLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.padding
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceAttribute

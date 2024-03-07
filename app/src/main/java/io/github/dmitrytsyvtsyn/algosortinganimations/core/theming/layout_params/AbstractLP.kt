@@ -2,26 +2,48 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_param
 
 import android.view.ViewGroup
 
-abstract class AbstractLP<T : ViewGroup.LayoutParams, R>(private val params: T, private val match: Int, private val wrap: Int) {
+abstract class AbstractLP<T : ViewGroup.LayoutParams, R : AbstractLP<T, R>>(
+    protected val params: T,
+    private val match: Int,
+    private val wrap: Int
+) {
 
-    abstract fun with(params: T) : R
+    protected abstract fun applyParams(block: R.() -> Unit): R
 
-    fun matchWidth() = with(params.apply { width = match })
-    fun matchHeight() = with(params.apply { height = match })
-    fun match() = with(params.apply {
-        width = match
-        height = match
-    })
+    fun matchWidth() = applyParams {
+        params.width = match
+    }
 
-    fun wrapWidth() = with(params.apply { width = wrap })
-    fun wrapHeight() = with(params.apply { height = wrap })
-    fun wrap() = with(params.apply {
-        width = wrap
-        height = wrap
-    })
+    fun matchHeight() = applyParams {
+        params.height = match
+    }
 
-    fun width(dp: Int) = with(params.apply { width = dp })
-    fun height(dp: Int) = with(params.apply { height = dp })
+    fun match() = applyParams {
+        params.width = match
+        params.height = match
+    }
+
+    fun wrapWidth() = applyParams {
+        params.width = wrap
+    }
+
+    fun wrapHeight() = applyParams {
+        params.height = wrap
+    }
+
+    fun wrap() = applyParams {
+        params.width = wrap
+        params.height = wrap
+    }
+
+    fun width(dp: Int) = applyParams {
+        params.width = dp
+    }
+
+    fun height(dp: Int) = applyParams {
+        params.height = dp
+    }
 
     fun build(): T = params
+
 }
