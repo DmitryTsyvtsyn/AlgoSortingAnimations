@@ -17,24 +17,37 @@ class Navigator(
 
     private val stack = mutableListOf<NavigationScreen>()
     private val callbacks = mutableListOf<OnBackPressedCallback>()
+    private val providers = mutableMapOf<String, ViewModelProvider>()
 
     private val stackId = R.id.navigation_stack
 
     fun navigateForward(event: NavigationScreen, isAddToBackStack: Boolean = true) {
-        val view = event.view(BaseParams(parent.context, this, viewModelProvider))
-        parent.addView(view)
+        when {
+            isAddToBackStack -> {
+                val key = key(event::class.java)
+                val provider = parentViewModelProvider().provideSubProvider(key)
+                providers[key] = provider
+                parent.addView(event.view(BaseParams(parent.context, this, provider)))
+                stack.add(event)
 
-        if (isAddToBackStack) {
-            stack.add(event)
-            createOnBackPressedCallback()
+                val callback = createOnBackPressedCallback()
+                callbacks.add(callback)
+                onBackPressedDispatcher.addCallback(callback)
+            }
+            else -> {
+                parent.addView(event.view(BaseParams(parent.context, this, viewModelProvider)))
+            }
         }
     }
 
     fun navigateBack(): Boolean {
         if (stack.isEmpty()) return false
 
+        val event = stack.removeLast()
+        val key = key(event::class.java)
+        viewModelProvider.removeSubProvider(key)
+        providers.remove(key)
         parent.removeLast()
-        stack.removeLast()
         callbacks.removeLast().changeIsEnabled(false)
 
         return true
@@ -61,18 +74,25 @@ class Navigator(
         cache.save(stackId, stack)
     }
 
-    private fun createOnBackPressedCallback() {
-        val callback = object : OnBackPressedCallback(true) {
+    fun interface NavigationScreen {
+        fun view(params: BaseParams): View
+    }
+
+    private fun createOnBackPressedCallback() =
+        object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 navigateBack()
             }
         }
-        callbacks.add(callback)
-        onBackPressedDispatcher.addCallback(callback)
-    }
 
-    fun interface NavigationScreen {
-        fun view(params: BaseParams): View
+    private fun key(navigationScreenClass: Class<out NavigationScreen>) =
+        "ViewModelProvider.SubProvider.Key.${navigationScreenClass.canonicalName}"
+
+    private fun parentViewModelProvider(): ViewModelProvider {
+        if (stack.isEmpty()) return viewModelProvider
+
+        val key = key(stack.last()::class.java)
+        return providers[key] ?: throw IllegalStateException("Not found such a ViewModelProvider with the key: $key")
     }
 
 }

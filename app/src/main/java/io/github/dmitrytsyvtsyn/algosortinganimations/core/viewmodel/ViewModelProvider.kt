@@ -1,12 +1,37 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel
 
-class ViewModelProvider {
+class ViewModelProvider : CoreViewModel {
 
     private val cache = hashMapOf<String, CoreViewModel>()
 
+    fun provideSubProvider(key: String, factory: () -> ViewModelProvider = ::ViewModelProvider): ViewModelProvider {
+        val provider = cache[key]
+        if (provider != null && provider is ViewModelProvider) return provider
+
+        val newProvider = factory.invoke()
+        val newProviderCache = newProvider.cache
+        cache.forEach { (key, value) ->
+            if (value !is ViewModelProvider) {
+                newProviderCache[key] = value
+            }
+        }
+
+        cache[key] = newProvider
+
+        return newProvider
+    }
+
+    fun removeSubProvider(key: String) {
+        val viewModel = cache[key]
+        if (viewModel is ViewModelProvider) {
+            viewModel.cache.clear()
+            cache.remove(key)
+        }
+    }
+
     fun <T : CoreViewModel> provide(viewModelClass: Class<T>): T {
         val key = key(viewModelClass)
-        return cache[key] as? T ?: throw IllegalStateException("Not found such a ViewModel with key: $key")
+        return cache[key] as? T ?: throw IllegalStateException("Not found such a ViewModel with the key: $key")
     }
 
     fun <T : CoreViewModel> provide(viewModelClass: Class<T>, factory: () -> T): T {
@@ -17,10 +42,6 @@ class ViewModelProvider {
         val viewModel = factory.invoke()
         cache[key] = viewModel
         return viewModel
-    }
-
-    fun <T : CoreViewModel> clear(viewModelClass: Class<T>) {
-        cache.remove(key(viewModelClass))
     }
 
     private fun <T> key(viewModelClass: Class<T>): String =

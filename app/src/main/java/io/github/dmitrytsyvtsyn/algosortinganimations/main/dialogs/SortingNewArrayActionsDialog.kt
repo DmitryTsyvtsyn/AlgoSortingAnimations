@@ -205,7 +205,6 @@ class SortingNewArrayActionsDialog(params: BaseParams) : FrameLayout(params.cont
 
                 if (state.hasChanged(SortingNewArrayActionsState.backNavigatedChanged)) {
                     if (state.backNavigated) {
-                        params.viewModelProvider.clear(SortingNewArrayActionsViewModel::class.java)
                         navigator.navigateBack()
                     }
                 }

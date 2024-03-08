@@ -20,7 +20,7 @@ class SortingNewArrayActionsViewModel(
     val state = _state.asStateFlow()
 
     val array: IntArray
-        get() = _state.value.array
+        get() = _state.value.array.copyOf()
 
     fun changeSize(size: Int) = updateState {
         copyWith(size)
