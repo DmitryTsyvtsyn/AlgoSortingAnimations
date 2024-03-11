@@ -8,6 +8,7 @@ import android.graphics.Typeface
 import android.os.SystemClock
 import android.text.TextPaint
 import android.view.View
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.logger.ProxyLogger
 import kotlin.math.roundToInt
 
 class SortingAlgorithmView(context: Context) : View(context) {
@@ -21,13 +22,26 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private val Int.sp
         get() = this * resources.displayMetrics.scaledDensity
 
+    private val isAnimationEnabled: Boolean
+        get() = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            ValueAnimator.areAnimatorsEnabled()
+        } else {
+            true
+        }
+
     private val tag = "SortingAlgorithmView"
 
     private var defaultStrokeWidth = 2.5f.dpf
     private var selectedStrokeWidth = 5f.dpf
-
     private var defaultStrokeColor = 0xff019701.toInt()
     private var selectedStrokeColor = 0xff015501.toInt()
+    private var selectionAnimationDuration = 2_500L
+    private var movingAnimationDuration = 5_000L
+    private var isRepeatableAnimation = true
+    private var repeatableAnimationDuration = 2_500L
+    private var itemSize = 48.dpf
+    private var itemMargin = 8.dpf
+    private var itemRadius = 8.dpf
 
     private val itemPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -36,22 +50,12 @@ class SortingAlgorithmView(context: Context) : View(context) {
         textSize = 19.sp
     }
 
-    private val isAnimationEnabled: Boolean
-        get() = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            ValueAnimator.areAnimatorsEnabled()
-        } else {
-            true
-        }
-
     private val sortingItemsStates = mutableListOf<SortingItemState>()
     private var sortingArrayCopy = intArrayOf()
 
-    private val itemSize = 48.dpf
-    private val itemMargin = 8.dpf
-    private val radius = 8.dpf
     private val descent = textPaint.descent()
 
-    private var stepIndex = -1
+    private var stepIndex = 0
     private var stepListener: (Int, SortingAlgorithmStep) -> Unit = { _, _ -> }
     private val steps = mutableListOf<SortingAlgorithmStep>()
 
@@ -60,11 +64,10 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private var currentAnimationTime = 0L
     private var pausedAnimationDifference = 0L
 
-    private val selectionAnimationDuration = 2_500
-    private val movingAnimationDuration = 5_000
-
     private var startOfView = 0f
     private var topOfView = 0f
+
+    private val startAnimationDelayedRunnable = Runnable { startAnimation() }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val statesSize = sortingItemsStates.size
@@ -109,19 +112,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
         startOfView = measuredWidth / 2 - itemSize * sortingItemsStates.size / 2
         topOfView = measuredHeight / 2 - itemSize / 2
 
-        sortingItemsStates.forEachIndexed { index, state ->
-            state.addPosition(
-                startPosition = startOfView + itemSize * index,
-                topPosition = topOfView
-            ).addStrokeWidth(defaultStrokeWidth)
-        }
-
+        resetItems()
         setMeasuredDimension(measuredWidth, measuredHeight)
     }
 
     override fun onDraw(canvas: Canvas) {
-        var index = 0
-
         val animationTimeDifference = SystemClock.uptimeMillis() - currentAnimationTime
         pausedAnimationDifference = animationTimeDifference
 
@@ -131,6 +126,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
         var haveItemsAnimation = false
 
+        var index = 0
         while (index < sortingItemsStates.size) {
             val state = sortingItemsStates[index]
 
@@ -141,7 +137,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
             val strokeColor = state.strokeColor()
             itemPaint.color = strokeColor
             itemPaint.strokeWidth = strokeWidth
-            canvas.drawRoundRect(start + strokeWidthHalf, top + strokeWidthHalf, start + itemSize - strokeWidthHalf, top + itemSize - strokeWidthHalf, radius, radius, itemPaint)
+            canvas.drawRoundRect(start + strokeWidthHalf, top + strokeWidthHalf, start + itemSize - strokeWidthHalf, top + itemSize - strokeWidthHalf, itemRadius, itemRadius, itemPaint)
 
             val text = state.title
             val textWidth = textPaint.measureText(text)
@@ -173,6 +169,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
         }
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        clearCallbacks()
+    }
+
     fun changeParams(
         strokeWidth: Float = this.defaultStrokeWidth,
         selectedStrokeWidth: Float = this.selectedStrokeWidth,
@@ -180,8 +181,19 @@ class SortingAlgorithmView(context: Context) : View(context) {
         selectedStrokeColor: Int = this.selectedStrokeColor,
         textColor: Int = this.textPaint.color,
         textSize: Float = this.textPaint.textSize,
-        typeface: Typeface = this.textPaint.typeface
+        typeface: Typeface = this.textPaint.typeface,
+        selectionAnimationDuration: Long = this.selectionAnimationDuration,
+        movingAnimationDuration: Long = this.movingAnimationDuration,
+        isRepeatableAnimation: Boolean = this.isRepeatableAnimation,
+        repeatableAnimationDuration: Long = this.repeatableAnimationDuration,
+        itemSize: Float = this.itemSize,
+        itemMargin: Float = this.itemMargin,
+        itemRadius: Float = this.itemRadius
     ) {
+        clearCallbacks()
+
+        val pausedAnimation = pauseAnimation()
+
         this.defaultStrokeWidth = strokeWidth
         this.selectedStrokeWidth = selectedStrokeWidth
 
@@ -192,7 +204,21 @@ class SortingAlgorithmView(context: Context) : View(context) {
         this.textPaint.textSize = textSize
         this.textPaint.typeface = typeface
 
-        invalidate()
+        this.selectionAnimationDuration = selectionAnimationDuration
+        this.movingAnimationDuration = movingAnimationDuration
+
+        this.isRepeatableAnimation = isRepeatableAnimation
+        this.repeatableAnimationDuration = repeatableAnimationDuration
+
+        this.itemSize = itemSize
+        this.itemMargin = itemMargin
+        this.itemRadius = itemRadius
+
+        if (pausedAnimation) {
+            startAnimation()
+        } else {
+            invalidate()
+        }
     }
 
     // values: 0f..1f
@@ -204,7 +230,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     fun changeAnimationSteps(newSteps: List<SortingAlgorithmStep>) {
+        ProxyLogger.debug(tag, "changeAnimationSteps($newSteps) called")
+
         if (newSteps.isEmpty()) throw IllegalArgumentException("The steps is empty")
+
+        clearCallbacks()
 
         steps.clear()
         steps.addAll(newSteps)
@@ -224,34 +254,27 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
     // values: 0f..1f
     fun changeAnimationProgress(progress: Float) {
+        ProxyLogger.debug(tag, "changeAnimationProgress($progress) called")
+
         if (progress < 0f || progress > 1f) throw IllegalArgumentException("The progress: $progress must have the range: 0f..1f")
         if (steps.isEmpty()) throw IllegalArgumentException("The steps is empty")
 
         val isAnimationWasStarted = pauseAnimation()
 
-        val array = sortingArrayCopy.copyOf()
-
         val currentStepIndex = ((steps.size - 1) * progress).roundToInt()
-        var index = 0
-        while (index <= currentStepIndex) {
-            steps[index].modifyArray(array)
-
-            index++
+        ProxyLogger.debug(tag, "currentStepIndex: $progress")
+        ProxyLogger.debug(tag, "stepIndex before comparing: $stepIndex")
+        if (currentStepIndex < stepIndex) {
+            resetItems() // inverted handleStep() is not implemented
         }
+        ProxyLogger.debug(tag, "stepIndex after comparing: $stepIndex")
+        while (stepIndex < currentStepIndex) {
+            handleStep(animate = false)
 
-        stepIndex = currentStepIndex
-
-        index = 0
-        while (index < array.size) {
-            sortingItemsStates[index]
-                .changeTitle(array[index].toString())
-                .forcePosition(
-                    startPosition = startOfView + itemSize * index,
-                    topPosition = topOfView
-                )
-                .forceStrokeWidth(defaultStrokeWidth)
-            index++
+            stepIndex++
         }
+        handleStep(animate = false)
+        ProxyLogger.debug(tag, "stepIndex after while cycle: $stepIndex")
 
         if (isAnimationWasStarted) {
             startAnimation()
@@ -262,25 +285,21 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     fun changeArray(intArray: IntArray) {
-        val arraySize = intArray.size
-        val minItemSize = 2
-        val maxItemSize = 8
-        if (arraySize < minItemSize || arraySize > maxItemSize) {
-            throw IllegalArgumentException("The array $intArray has an unsuitable size: ${intArray.size}, it must have a size between $minItemSize and $maxItemSize")
-        }
-        stepIndex = 0
+        ProxyLogger.debug(tag, "changeArray($intArray) called")
+
+        checkArraySize(intArray); clearCallbacks()
+
         sortingArrayCopy = intArray.copyOf()
+
         sortingItemsStates.clear()
-        for (value in intArray) {
-            sortingItemsStates.add(SortingItemState(
-                text = value.toString(),
-                strokeColor = defaultStrokeColor
-            ))
-        }
+        sortingItemsStates.addAll(sortingArrayCopy.map { SortingItemState() })
+
         requestLayout()
     }
 
     fun startAnimation() {
+        ProxyLogger.debug(tag, "startAnimation() called")
+
         if (steps.isEmpty()) throw IllegalStateException("The steps list is empty!")
 
         if (animationState == SortingAnimationState.ANIMATION_RUNNING) return
@@ -290,6 +309,10 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     fun pauseAnimation(): Boolean {
+        ProxyLogger.debug(tag, "pauseAnimation() called")
+
+        clearCallbacks()
+
         if (animationState == SortingAnimationState.ANIMATION_RUNNING) {
             animationState = SortingAnimationState.ANIMATION_PAUSED
             return true
@@ -300,14 +323,8 @@ class SortingAlgorithmView(context: Context) : View(context) {
     fun stopAnimation() {
         if (animationState != SortingAnimationState.ANIMATION_STOPPED) {
             animationState = SortingAnimationState.ANIMATION_STOPPED
-            pausedAnimationDifference = 0
-            stepIndex = 0
 
-            var index = 0
-            while (index < sortingArrayCopy.size) {
-                sortingItemsStates[index].changeTitle(sortingArrayCopy[index].toString())
-                index++
-            }
+            resetItems()
         }
     }
 
@@ -315,38 +332,76 @@ class SortingAlgorithmView(context: Context) : View(context) {
         stepListener = listener
     }
 
-    private fun handleStep() {
+    private fun handleStep(animate: Boolean = true) {
+        ProxyLogger.debug(tag, "handleStep($animate) called")
+        ProxyLogger.debug(tag, "stepIndex: $stepIndex")
+
+        clearCallbacks()
+
         val step = steps[stepIndex]
         stepListener.invoke(stepIndex, step)
         val isUpdated = when (step) {
             is SortingAlgorithmStep.Swap -> {
-                swapItems(step.index1, step.index2)
+                swapItems(step.index1, step.index2, animate)
             }
             is SortingAlgorithmStep.Select -> {
-                decorateItems(SortingItemDecorator.SELECTED, step.indices)
+                decorateItems(SortingItemDecorator.SELECTED, step.indices, animate)
             }
             is SortingAlgorithmStep.Unselect -> {
-                decorateItems(SortingItemDecorator.EMPTY, step.indices)
+                decorateItems(SortingItemDecorator.EMPTY, step.indices, animate)
             }
             is SortingAlgorithmStep.End -> {
+                val hasRunning = animationState == SortingAnimationState.ANIMATION_RUNNING
                 stopAnimation()
-                false
+                hasRunning
             }
         }
         if (isUpdated) {
-            if (isAnimationEnabled) {
-                currentAnimationTime = SystemClock.uptimeMillis() - pausedAnimationDifference
-                postInvalidateOnAnimation()
-            } else {
-                currentAnimationTime = 0
-                invalidate()
+            when {
+                animationState == SortingAnimationState.ANIMATION_STOPPED && isRepeatableAnimation -> {
+                    postDelayed(startAnimationDelayedRunnable, repeatableAnimationDuration)
+                }
+                isAnimationEnabled && animate -> {
+                    currentAnimationTime = SystemClock.uptimeMillis() - pausedAnimationDifference
+                    postInvalidateOnAnimation()
+                }
+                else -> {
+                    currentAnimationTime = 0
+                    invalidate()
+                }
             }
         }
     }
 
+    private fun resetItems() {
+        ProxyLogger.debug(tag, "resetItems() called")
+
+        clearCallbacks()
+
+        pausedAnimationDifference = 0
+        stepIndex = 0
+
+        sortingArrayCopy.forEachIndexed { index, value ->
+            sortingItemsStates[index]
+                .changeTitle(value.toString())
+                .forcePosition(
+                    startPosition = startOfView + itemSize * index,
+                    topPosition = topOfView
+                )
+                .forceStrokeWidth(defaultStrokeWidth)
+                .changeStrokeColor(defaultStrokeColor)
+        }
+    }
+
+    private fun clearCallbacks() {
+        ProxyLogger.debug(tag, "clearCallbacks() called")
+        removeCallbacks(startAnimationDelayedRunnable)
+    }
+
     private fun decorateItems(
         decorator: SortingItemDecorator,
-        indices: IntArray
+        indices: IntArray,
+        animate: Boolean = true
     ) : Boolean {
         val statesIndices = sortingItemsStates.indices
 
@@ -363,9 +418,18 @@ class SortingAlgorithmView(context: Context) : View(context) {
                     SortingItemDecorator.EMPTY -> defaultStrokeWidth to defaultStrokeColor
                 }
 
-                sortingItemsStates[index]
-                    .addStrokeWidth(strokeWidth)
-                    .changeStrokeColor(strokeColor)
+                when {
+                    animate -> {
+                        sortingItemsStates[index]
+                            .addStrokeWidth(strokeWidth)
+                            .changeStrokeColor(strokeColor)
+                    }
+                    else -> {
+                        sortingItemsStates[index]
+                            .forceStrokeWidth(strokeWidth)
+                            .changeStrokeColor(strokeColor)
+                    }
+                }
 
                 isUpdated = true
             }
@@ -376,7 +440,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
         return isUpdated
     }
 
-    private fun swapItems(index1: Int, index2: Int): Boolean {
+    private fun swapItems(index1: Int, index2: Int, animate: Boolean = true): Boolean {
         val indices = sortingItemsStates.indices
 
         if (index1 in indices && index2 in indices) {
@@ -389,21 +453,31 @@ class SortingAlgorithmView(context: Context) : View(context) {
             val firstStartPosition = sortingState1.startPosition()
             val secondStartPosition = sortingState2.startPosition()
 
-            sortingState1
-                .addPosition(topPosition = sortingState1.topPosition() - itemSize)
-                .addPosition(startPosition = secondStartPosition)
-                .addPosition(topPosition = sortingState1.topPosition() + itemSize)
-            sortingState2
-                .addPosition(topPosition = sortingState2.topPosition() + itemSize)
-                .addPosition(startPosition = firstStartPosition)
-                .addPosition(topPosition = sortingState2.topPosition() - itemSize)
+            when {
+                animate -> {
+                    sortingState1
+                        .addPosition(topPosition = sortingState1.topPosition() - itemSize)
+                        .addPosition(startPosition = secondStartPosition)
+                        .addPosition(topPosition = sortingState1.topPosition() + itemSize)
+                    sortingState2
+                        .addPosition(topPosition = sortingState2.topPosition() + itemSize)
+                        .addPosition(startPosition = firstStartPosition)
+                        .addPosition(topPosition = sortingState2.topPosition() - itemSize)
 
-            sortingState1.addOnAnimationEnd {
-                sortingItemsStates[index1] = sortingState2
-            }
+                    sortingState1.addOnAnimationEnd {
+                        sortingItemsStates[index1] = sortingState2
+                    }
 
-            sortingState2.addOnAnimationEnd {
-                sortingItemsStates[index2] = sortingState1
+                    sortingState2.addOnAnimationEnd {
+                        sortingItemsStates[index2] = sortingState1
+                    }
+                }
+                else -> {
+                    sortingState1.forcePosition(startPosition = secondStartPosition)
+                    sortingState2.forcePosition(startPosition = firstStartPosition)
+                    sortingItemsStates[index1] = sortingState2
+                    sortingItemsStates[index2] = sortingState1
+                }
             }
 
             return true
@@ -466,6 +540,15 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 startPosition = sortingItemsStates[newIndex].startPosition(),
                 topPosition = topPosition + itemSize + itemMargin * 2
             )
+        }
+    }
+
+    private fun checkArraySize(intArray: IntArray) {
+        val arraySize = intArray.size
+        val minItemSize = 2
+        val maxItemSize = 8
+        if (arraySize < minItemSize || arraySize > maxItemSize) {
+            throw IllegalArgumentException("The array $intArray has an unsuitable size: ${intArray.size}, it must have a size between $minItemSize and $maxItemSize")
         }
     }
 
