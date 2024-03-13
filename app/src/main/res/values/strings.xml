@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AlgoSortingAnimations</string>
+    <string name="app_name">AlgoSorts</string>
     <string name="start">Start</string>
     <string name="pause">Pause</string>
     <string name="bubble_sort">Bubble sort</string>

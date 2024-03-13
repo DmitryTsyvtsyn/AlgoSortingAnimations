@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.SystemClock
 import android.text.TextPaint
@@ -49,11 +50,10 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private val textPaint = TextPaint().apply {
         textSize = 19.sp
     }
+    private val textBounds = Rect()
 
     private val sortingItemsStates = mutableListOf<SortingItemState>()
     private var sortingArrayCopy = intArrayOf()
-
-    private val descent = textPaint.descent()
 
     private var stepIndex = 0
     private var stepListener: (Int, SortingAlgorithmStep) -> Unit = { _, _ -> }
@@ -140,11 +140,13 @@ class SortingAlgorithmView(context: Context) : View(context) {
             canvas.drawRoundRect(start + strokeWidthHalf, top + strokeWidthHalf, start + itemSize - strokeWidthHalf, top + itemSize - strokeWidthHalf, itemRadius, itemRadius, itemPaint)
 
             val text = state.title
-            val textWidth = textPaint.measureText(text)
+            textPaint.getTextBounds(text, 0, text.length, textBounds)
+            val textWidth = textBounds.width()
+            val textHeight = textBounds.height()
             canvas.drawText(
                 text, 0, text.length,
-                start + itemSize / 2 - textWidth / 2,
-                top + itemSize / 2 + descent,
+                start + itemSize / 2 - (textWidth / 2),
+                top + itemSize / 2 + textHeight / 2,
                 textPaint
             )
 
