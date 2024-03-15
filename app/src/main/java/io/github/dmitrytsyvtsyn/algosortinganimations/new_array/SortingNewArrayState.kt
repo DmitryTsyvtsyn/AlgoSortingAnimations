@@ -1,6 +1,6 @@
-package io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs
+package io.github.dmitrytsyvtsyn.algosortinganimations.new_array
 
-class SortingNewArrayActionsState(
+class SortingNewArrayState(
     val size: Int = 0,
     val sizes: IntArray = intArrayOf(),
     val array: IntArray = intArrayOf(),
@@ -10,7 +10,7 @@ class SortingNewArrayActionsState(
     
     fun hasChanged(pieceState: Int): Boolean = (compared and pieceState) == pieceState
     
-    fun difference(other: SortingNewArrayActionsState): SortingNewArrayActionsState {
+    fun difference(other: SortingNewArrayState): SortingNewArrayState {
         var compared = 0
 
         if (size != other.size) {
@@ -29,10 +29,10 @@ class SortingNewArrayActionsState(
             compared = compared or backNavigatedChanged
         }
 
-        return SortingNewArrayActionsState(size, sizes, array, backNavigated, compared)
+        return SortingNewArrayState(size, sizes, array, backNavigated, compared)
     }
     
-    fun copyWith(size: Int): SortingNewArrayActionsState {
+    fun changedWith(size: Int): SortingNewArrayState {
         val newArray = IntArray(size) { 0 }
         var index = 0
         while (index < size && index < array.size) {
@@ -40,12 +40,12 @@ class SortingNewArrayActionsState(
             index++
         }
 
-        return SortingNewArrayActionsState(size, sizes, newArray, backNavigated, compared)
+        return SortingNewArrayState(size, sizes, newArray, backNavigated, compared)
     }
 
-    fun copyWith(array: IntArray) = SortingNewArrayActionsState(size, sizes, array, backNavigated, compared)
+    fun changedWith(array: IntArray) = SortingNewArrayState(size, sizes, array, backNavigated, compared)
 
-    fun copyWith(backNavigated: Boolean) = SortingNewArrayActionsState(size, sizes, array, backNavigated, compared)
+    fun changedWith(backNavigated: Boolean) = SortingNewArrayState(size, sizes, array, backNavigated, compared)
 
     companion object {
         const val sizeChanged: Int = 1 // low byte: 00000001

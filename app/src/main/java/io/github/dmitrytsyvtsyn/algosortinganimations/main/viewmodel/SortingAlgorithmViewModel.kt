@@ -1,8 +1,7 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel
 
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.CoreViewModel
-import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.BubbleSort
-import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.BubbleSortImproved
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.BubbleSortAlgorithm
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.RandomArraysProducer
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.SortingAlgorithm
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,37 +11,35 @@ class SortingAlgorithmViewModel(
     producer: RandomArraysProducer = RandomArraysProducer(6)
 ) : CoreViewModel {
 
-    private val _algorithmListState = MutableStateFlow(listOf(
-        BubbleSort(),
-        BubbleSortImproved()
-    ))
-    val algorithmListState = _algorithmListState.asStateFlow()
-
-    private val _algorithmDetailState = MutableStateFlow(SortingAlgorithmState(
-        selectedAlgorithm = BubbleSort(),
+    private val _state = MutableStateFlow(SortingAlgorithmState(
+        selectedAlgorithm = BubbleSortAlgorithm(),
+        buttonState = SortingAnimationButtonState.PAUSED,
         sortingArray = producer.randomArray(6)
     ))
-    val algorithmDetailState = _algorithmDetailState.asStateFlow()
+    val state = _state.asStateFlow()
 
-    private val _buttonState = MutableStateFlow(SortingAnimationButtonState.PAUSED)
-    val buttonState = _buttonState.asStateFlow()
-
-    val arrayCopy: IntArray
-        get() = _algorithmDetailState.value.arrayCopy
+    val sortingArray: IntArray get() = _state.value.sortingArray.copyOf()
     
-    fun changeSortingAlgorithm(algorithm: SortingAlgorithm) {
-        _algorithmDetailState.value = _algorithmDetailState.value.copyWithSelectedAlgorithm(algorithm)
+    fun changeSortingAlgorithm(algorithm: SortingAlgorithm) = updateState {
+        changedWith(algorithm)
     }
 
-    fun changeSortingArray(array: IntArray) {
-        _algorithmDetailState.value = _algorithmDetailState.value.copyWithNewSortingArray(array)
+    fun changeSortingArray(array: IntArray) = updateState {
+        changedWith(array)
     }
 
-    fun toggleAnimation() {
-        _buttonState.value = when (_buttonState.value) {
-            SortingAnimationButtonState.PAUSED -> SortingAnimationButtonState.RUNNING
-            SortingAnimationButtonState.RUNNING -> SortingAnimationButtonState.PAUSED
-        }
+    fun toggleAnimation() = updateState {
+        changedWith(
+            when (buttonState) {
+                SortingAnimationButtonState.NONE,
+                SortingAnimationButtonState.PAUSED -> SortingAnimationButtonState.RUNNING
+                SortingAnimationButtonState.RUNNING -> SortingAnimationButtonState.PAUSED
+            }
+        )
+    }
+
+    private inline fun updateState(newState: SortingAlgorithmState.() -> SortingAlgorithmState) {
+        _state.value = _state.value.newState()
     }
 
 }

@@ -24,6 +24,7 @@ object ThemeManager {
     }
 
     fun changeInsets(newInsets: WindowInsets) {
+        if (insets == newInsets) return
         insets = newInsets
         themeListeners.notifyAll()
     }
@@ -45,6 +46,21 @@ object ThemeManager {
         val top: Int,
         val end: Int,
         val bottom: Int
-    )
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (other == null) return false
+            if (other !is WindowInsets) return false
+
+            return start == other.start && top == other.top &&
+                    end == other.end && bottom == other.bottom
+        }
+        override fun hashCode(): Int {
+            var result = start
+            result = 31 * result + top
+            result = 31 * result + end
+            result = 31 * result + bottom
+            return result
+        }
+    }
 
 }

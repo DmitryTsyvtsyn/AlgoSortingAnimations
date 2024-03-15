@@ -4,7 +4,7 @@ import android.content.res.Resources
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.customview.SortingAlgorithmStep
 
-class BubbleSort : SortingAlgorithm {
+class BubbleSortAlgorithm : SortingAlgorithm {
 
     override val title = R.string.bubble_sort
     override val description = R.string.bubble_sort

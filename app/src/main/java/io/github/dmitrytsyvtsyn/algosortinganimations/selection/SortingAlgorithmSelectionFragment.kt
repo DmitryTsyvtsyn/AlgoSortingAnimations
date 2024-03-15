@@ -29,7 +29,10 @@ class SortingAlgorithmSelectionFragment(params: BaseParams) : CoreLinearLayout(p
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
 
     private val navigator = params.navigator
-    private val viewModel = params.viewModelProvider.provide(SortingAlgorithmViewModel::class.java)
+    private val parentViewModel = params.viewModelProvider.provide(SortingAlgorithmViewModel::class.java)
+    private val viewModel = params.viewModelProvider.provide(SortingAlgorithmSelectionViewModel::class.java) {
+        SortingAlgorithmSelectionViewModel()
+    }
 
     init {
         orientation = VERTICAL
@@ -41,7 +44,7 @@ class SortingAlgorithmSelectionFragment(params: BaseParams) : CoreLinearLayout(p
         addView(toolbarView)
 
         coroutineScope.launch {
-            viewModel.algorithmListState.collect { algorithms ->
+            viewModel.state.collect { algorithms ->
                 algorithms.forEachIndexed { index, algorithm ->
                     val sortingListView = CoreButton(
                         ctx = context,
@@ -61,7 +64,7 @@ class SortingAlgorithmSelectionFragment(params: BaseParams) : CoreLinearLayout(p
                     sortingListView.layoutParams(layoutParams)
 
                     sortingListView.setOnClickListener {
-                        viewModel.changeSortingAlgorithm(algorithm)
+                        parentViewModel.changeSortingAlgorithm(algorithm)
                         navigator.navigateBack()
                     }
                     addView(sortingListView)

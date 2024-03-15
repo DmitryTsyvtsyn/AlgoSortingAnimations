@@ -4,10 +4,10 @@ import android.content.res.Resources
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.customview.SortingAlgorithmStep
 
-class BubbleSortImproved : SortingAlgorithm {
+class BubbleSortBetterAlgorithm : SortingAlgorithm {
 
     override val title = R.string.bubble_sort_improved
-    override val description = R.string.bubble_sort
+    override val description = R.string.bubble_sort_improved
 
     override val worstTimeComplexity = "O(n²)"
     override val bestTimeComplexity = "O(n)"

@@ -1,17 +1,17 @@
-package io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs
+package io.github.dmitrytsyvtsyn.algosortinganimations.new_array
 
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.CoreViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.RandomArraysProducer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SortingNewArrayActionsViewModel(
+class SortingNewArrayViewModel(
     private val producer: RandomArraysProducer = RandomArraysProducer(6),
     array: IntArray = producer.randomArray(6),
 ) : CoreViewModel {
 
     private val _state = MutableStateFlow(
-        SortingNewArrayActionsState(
+        SortingNewArrayState(
             size = array.size,
             sizes = intArrayOf(2, 3, 4, 5, 6),
             array = array
@@ -23,22 +23,22 @@ class SortingNewArrayActionsViewModel(
         get() = _state.value.array.copyOf()
 
     fun changeSize(size: Int) = updateState {
-        copyWith(size)
+        changedWith(size)
     }
 
     fun generateRandomArray() = updateState {
-        copyWith(producer.randomArray(size))
+        changedWith(producer.randomArray(size))
     }
 
     fun generateSortedArray() = updateState {
-        copyWith(producer.randomArray(size).sortedArray())
+        changedWith(producer.randomArray(size).sortedArray())
     }
 
     fun navigateBack() = updateState {
-        copyWith(backNavigated = true)
+        changedWith(backNavigated = true)
     }
 
-    private inline fun updateState(newState: SortingNewArrayActionsState.() -> SortingNewArrayActionsState) {
+    private inline fun updateState(newState: SortingNewArrayState.() -> SortingNewArrayState) {
         _state.value = _state.value.newState()
     }
 

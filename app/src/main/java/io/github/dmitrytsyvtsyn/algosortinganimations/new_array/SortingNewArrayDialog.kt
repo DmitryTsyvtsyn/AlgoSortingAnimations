@@ -1,4 +1,4 @@
-package io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs
+package io.github.dmitrytsyvtsyn.algosortinganimations.new_array
 
 import android.annotation.SuppressLint
 import android.view.Gravity
@@ -31,15 +31,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @SuppressLint("ViewConstructor")
-class SortingNewArrayActionsDialog(params: BaseParams) : FrameLayout(params.context) {
+class SortingNewArrayDialog(params: BaseParams) : FrameLayout(params.context) {
 
     private val job = Job()
     private val coroutineScope = CoroutineScope(job + Dispatchers.Main.immediate)
 
     private val navigator = params.navigator
     private val parentViewModel = params.viewModelProvider.provide(SortingAlgorithmViewModel::class.java)
-    private val viewModel = params.viewModelProvider.provide(SortingNewArrayActionsViewModel::class.java) {
-        SortingNewArrayActionsViewModel(array = parentViewModel.arrayCopy)
+    private val viewModel = params.viewModelProvider.provide(SortingNewArrayViewModel::class.java) {
+        SortingNewArrayViewModel(array = parentViewModel.sortingArray)
     }
 
     private val IntArray.string
@@ -165,18 +165,17 @@ class SortingNewArrayActionsDialog(params: BaseParams) : FrameLayout(params.cont
             .marginEnd(marginMedium))
         contentView.addView(okButton)
 
-        var cachedState = SortingNewArrayActionsState()
-
+        var cachedState = SortingNewArrayState()
         coroutineScope.launch {
             viewModel.state.collect {
 
                 val state = it.difference(cachedState); cachedState = it
 
-                if (state.hasChanged(SortingNewArrayActionsState.arrayChanged)) {
+                if (state.hasChanged(SortingNewArrayState.arrayChanged)) {
                     arrayExampleView.text = state.array.string
                 }
 
-                if (state.hasChanged(SortingNewArrayActionsState.sizesChanged)) {
+                if (state.hasChanged(SortingNewArrayState.sizesChanged)) {
                     arraySizesContentView.removeAllViews()
                     state.sizes.forEachIndexed { index, size ->
                         val button = CoreRadioButton(context)
@@ -196,14 +195,14 @@ class SortingNewArrayActionsDialog(params: BaseParams) : FrameLayout(params.cont
                     }
                 }
 
-                if (state.hasChanged(SortingNewArrayActionsState.sizeChanged)) {
+                if (state.hasChanged(SortingNewArrayState.sizeChanged)) {
                     arraySizesContentView.forEach { view ->
                         val checkedView = view as CoreRadioButton
                         checkedView.isChecked = checkedView.tag == state.size
                     }
                 }
 
-                if (state.hasChanged(SortingNewArrayActionsState.backNavigatedChanged)) {
+                if (state.hasChanged(SortingNewArrayState.backNavigatedChanged)) {
                     if (state.backNavigated) {
                         navigator.navigateBack()
                     }

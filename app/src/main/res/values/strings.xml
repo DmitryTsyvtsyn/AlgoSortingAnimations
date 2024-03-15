@@ -4,6 +4,7 @@
     <string name="pause">Pause</string>
     <string name="bubble_sort">Bubble sort</string>
     <string name="bubble_sort_improved">Bubble sort improved</string>
+    <string name="selection_sort">Selection sort</string>
     <string name="new_array">New array</string>
     <string name="worst_case_time">Worst-case time:</string>
     <string name="best_case_time">Best-case time:</string>

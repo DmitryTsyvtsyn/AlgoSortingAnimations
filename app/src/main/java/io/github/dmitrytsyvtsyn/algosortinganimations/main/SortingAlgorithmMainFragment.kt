@@ -27,7 +27,8 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.Type
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefacePath
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.customview.SortingAlgorithmView
-import io.github.dmitrytsyvtsyn.algosortinganimations.main.dialogs.SortingNewArrayActionsDialog
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmState
+import io.github.dmitrytsyvtsyn.algosortinganimations.new_array.SortingNewArrayDialog
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmViewModel
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAnimationButtonState
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.views.ComplexityView
@@ -138,7 +139,7 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
         )
         randomArrayButton.setText(R.string.new_array)
         randomArrayButton.setOnClickListener {
-            navigator.navigateForward(::SortingNewArrayActionsDialog)
+            navigator.navigateForward(::SortingNewArrayDialog)
         }
         randomArrayButton.layoutParams(linearLayoutParams().wrap()
             .marginStart(context.dp(12))
@@ -192,42 +193,51 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
             .marginTop(context.dp(12)))
         someDetailInformationView.addView(worstSpaceComplexityView)
 
+        var cachedState = SortingAlgorithmState()
         coroutineScope.launch {
-            viewModel.algorithmDetailState.collect { state ->
+            viewModel.state.collect {
 
-                with(state.selectedAlgorithm) {
-                    toolbarView.changeTitle(context.getString(title))
+                val state = it.difference(cachedState); cachedState = it
 
-                    worstTimeComplexityView.changeDescription(worstTimeComplexity)
-                    bestTimeComplexityView.changeDescription(bestTimeComplexity)
-                    averageTimeComplexityView.changeDescription(averageTimeComplexity)
-                    worstSpaceComplexityView.changeDescription(worstSpaceComplexity)
-                }
+                if (state.hasChanged(SortingAlgorithmState.selectedAlgorithmChanged)) {
+                    with(state.selectedAlgorithm) {
+                        toolbarView.changeTitle(context.getString(title))
 
-                sortingAlgorithmView.changeArray(state.arrayCopy)
-                sortingAlgorithmView.changeAnimationSteps(state.steps(resources))
-            }
-        }
-
-        coroutineScope.launch {
-            viewModel.buttonState.collect { state ->
-
-                val (imageResource, clickListener) = when (state) {
-                    SortingAnimationButtonState.PAUSED -> R.drawable.ic_play to OnClickListener {
-                        sortingAlgorithmView.startAnimation()
-                        viewModel.toggleAnimation()
-                    }
-                    SortingAnimationButtonState.RUNNING -> R.drawable.ic_pause to OnClickListener {
-                        sortingAlgorithmView.pauseAnimation()
-                        viewModel.toggleAnimation()
+                        worstTimeComplexityView.changeDescription(worstTimeComplexity)
+                        bestTimeComplexityView.changeDescription(bestTimeComplexity)
+                        averageTimeComplexityView.changeDescription(averageTimeComplexity)
+                        worstSpaceComplexityView.changeDescription(worstSpaceComplexity)
                     }
                 }
 
-                playPauseButtonView.setImageResource(imageResource)
-                playPauseButtonView.setOnClickListener(clickListener)
+                if (state.hasChanged(SortingAlgorithmState.buttonStateChanged)) {
+                    val (imageResource, clickListener) = when (state.buttonState) {
+                        SortingAnimationButtonState.NONE,
+                        SortingAnimationButtonState.PAUSED -> R.drawable.ic_play to OnClickListener {
+                            sortingAlgorithmView.startAnimation()
+                            viewModel.toggleAnimation()
+                        }
+                        SortingAnimationButtonState.RUNNING -> R.drawable.ic_pause to OnClickListener {
+                            sortingAlgorithmView.pauseAnimation()
+                            viewModel.toggleAnimation()
+                        }
+                    }
+
+                    playPauseButtonView.setImageResource(imageResource)
+                    playPauseButtonView.setOnClickListener(clickListener)
+                }
+
+                if (state.hasChanged(SortingAlgorithmState.sortingArrayChanged)) {
+                    sortingAlgorithmView.changeArray(state.sortingArray)
+                }
+
+                if (state.hasChanged(SortingAlgorithmState.selectedAlgorithmChanged)
+                    or state.hasChanged(SortingAlgorithmState.sortingArrayChanged)) {
+                    sortingAlgorithmView.changeAnimationSteps(state.steps(resources))
+                }
+
             }
         }
-
     }
 
     override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {

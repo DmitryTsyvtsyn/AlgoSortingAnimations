@@ -11,13 +11,13 @@ sealed class SortingAlgorithmStep(val titleResource: String) {
     class Select(val indices: IntArray, titleResource: String = ""): SortingAlgorithmStep(titleResource) {
 
         override fun toString(): String =
-            "Select(indices=$indices, titleResource=$titleResource)"
+            "Select(indices=${indices.toList()}, titleResource=$titleResource)"
     }
 
     class Unselect(val indices: IntArray, titleResource: String = ""): SortingAlgorithmStep(titleResource) {
 
         override fun toString(): String =
-            "Unselect(indices=$indices, titleResource=$titleResource)"
+            "Unselect(indices=${indices.toList()}, titleResource=$titleResource)"
     }
 
     class End(titleResource: String = "") : SortingAlgorithmStep(titleResource) {
