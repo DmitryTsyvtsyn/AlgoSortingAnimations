@@ -1,24 +1,26 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.customview
 
+
 class SortingItemState(
     private var text: String = "",
-    private var strokeColor: Int = 0
+    private var bgColor: Int = 0
 ) {
 
-    private val startPositions = AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f))
-    private val topPositions = AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f))
-    private val strokeWidthParams = AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f))
+    private val animatedProperties: Array<AnimatedArray<*>> = arrayOf(
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f))
+    )
 
     val title: String
         get() = text
 
     val isAnimationRunning: Boolean
-        get() = startPositions.size > 1 || topPositions.size > 1 || strokeWidthParams.size > 1
+        get() = animatedProperties.any { it.size > 1 }
 
     fun cancelAnimation(): SortingItemState {
-        startPositions.reset()
-        topPositions.reset()
-        strokeWidthParams.reset()
+        animatedProperties.forEach { it.reset() }
         return this
     }
 
@@ -27,40 +29,31 @@ class SortingItemState(
         animationEndListener = listener
     }
 
-    fun forcePosition(startPosition: Float = startPositions.peek(), topPosition: Float = topPositions.peek()): SortingItemState {
+    fun <T> forceValue(key: AnimationKey<T>, value: T): SortingItemState {
         animationEndListener = null
-        startPositions.forcePush(startPosition)
-        topPositions.forcePush(topPosition)
+        (animatedProperties[key.key] as AnimatedArray<T>).forcePush(value)
         return this
-    }
-    fun addPosition(startPosition: Float = startPositions.peek(), topPosition: Float = topPositions.peek()): SortingItemState {
-        startPositions.push(startPosition)
-        topPositions.push(topPosition)
-        return this
-    }
-    fun startPosition() = startPositions.peek()
-    fun animatedStartPosition(fraction: Float = 1f): Float {
-        checkAnimationEndedListener()
-        return startPositions.pop(fraction)
-    }
-    fun topPosition() = topPositions.peek()
-    fun animatedTopPosition(fraction: Float = 1f): Float {
-        checkAnimationEndedListener()
-        return topPositions.pop(fraction)
     }
 
-    fun forceStrokeWidth(strokeWidth: Float): SortingItemState {
-        animationEndListener = null
-        strokeWidthParams.forcePush(strokeWidth)
+    fun <T> addValue(key: AnimationKey<T>, value: T): SortingItemState {
+        (animatedProperties[key.key] as AnimatedArray<T>).push(value)
         return this
     }
-    fun addStrokeWidth(strokeWidth: Float): SortingItemState {
-        strokeWidthParams.push(strokeWidth)
+
+    fun <T> addLastValue(key: AnimationKey<T>): SortingItemState {
+        val animatedArray = animatedProperties[key.key] as AnimatedArray<T>
+        val lastValue = animatedArray.peek()
+        animatedArray.push(lastValue)
         return this
     }
-    fun animatedStrokeWidth(fraction: Float = 1f): Float {
+
+    fun <T> value(key: AnimationKey<T>): T {
+        return (animatedProperties[key.key] as AnimatedArray<T>).peek()
+    }
+
+    fun <T> animatedValue(key: AnimationKey<T>, fraction: Float): T {
         checkAnimationEndedListener()
-        return strokeWidthParams.pop(fraction)
+        return (animatedProperties[key.key] as AnimatedArray<T>).pop(fraction)
     }
 
     fun changeTitle(title: String): SortingItemState {
@@ -68,16 +61,24 @@ class SortingItemState(
         return this
     }
 
-    fun changeStrokeColor(color: Int) {
-        strokeColor = color
+    fun changeBgColor(color: Int): SortingItemState {
+        bgColor = color
+        return this
     }
-    fun strokeColor() = strokeColor
+    fun bgColor() = bgColor
 
     private fun checkAnimationEndedListener() {
         if (!isAnimationRunning) {
             animationEndListener?.invoke()
             animationEndListener = null
         }
+    }
+
+    sealed class AnimationKey<T>(val key: Int) {
+        object StartPosition : AnimationKey<Float>(0)
+        object TopPosition : AnimationKey<Float>(1)
+        object StrokeWidth : AnimationKey<Float>(2)
+        object SelectedSize : AnimationKey<Float>(3)
     }
 
 }

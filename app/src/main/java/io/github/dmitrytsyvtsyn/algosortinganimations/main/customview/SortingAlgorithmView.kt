@@ -132,14 +132,30 @@ class SortingAlgorithmView(context: Context) : View(context) {
         while (index < sortingItemsStates.size) {
             val state = sortingItemsStates[index]
 
-            val start = state.animatedStartPosition(movingAnimationFraction)
-            val top = state.animatedTopPosition(movingAnimationFraction)
-            val strokeWidth = state.animatedStrokeWidth(selectionAnimationFraction)
+            val start = state.animatedValue(SortingItemState.AnimationKey.StartPosition, movingAnimationFraction)
+            val top = state.animatedValue(SortingItemState.AnimationKey.TopPosition, movingAnimationFraction)
+            val strokeWidth = state.animatedValue(SortingItemState.AnimationKey.StrokeWidth, selectionAnimationFraction)
             val strokeWidthHalf = strokeWidth / 2
-            val strokeColor = state.strokeColor()
+            val strokeColor = state.bgColor()
             itemPaint.color = strokeColor
             itemPaint.strokeWidth = strokeWidth
             canvas.drawRoundRect(start + strokeWidthHalf, top + strokeWidthHalf, start + itemSize - strokeWidthHalf, top + itemSize - strokeWidthHalf, itemRadius, itemRadius, itemPaint)
+
+            val selectedSize = state.animatedValue(SortingItemState.AnimationKey.SelectedSize, selectionAnimationFraction)
+            if (selectedSize > 0f) {
+                val selectedSizeHalf = selectedSize / 2f
+                val startCenter = start + (itemSize / 2f)
+                val topCenter = top + (itemSize / 2f)
+                itemPaint.style = Paint.Style.FILL
+                canvas.drawRoundRect(
+                    startCenter - selectedSizeHalf,
+                    topCenter - selectedSizeHalf,
+                    startCenter + selectedSizeHalf,
+                    topCenter + selectedSizeHalf,
+                    itemRadius, itemRadius, itemPaint
+                )
+                itemPaint.style = Paint.Style.STROKE
+            }
 
             val text = state.title
             textPaint.getTextBounds(text, 0, text.length, textBounds)
@@ -249,11 +265,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     fun changeAnimationProgress(numberOfSteps: Int) {
-        val currentStepIndex = stepIndex + numberOfSteps
+        val newStepIndex = stepIndex + numberOfSteps
 
-        if (currentStepIndex < 0 || currentStepIndex > steps.size - 1) return
+        if (newStepIndex < 0 || newStepIndex > steps.size - 1) return
 
-        changeAnimationProgress(currentStepIndex / (steps.size - 1f))
+        changeAnimationProgress(newStepIndex / (steps.size - 1f))
     }
 
     // values: 0f..1f
@@ -265,14 +281,14 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
         val isAnimationWasStarted = pauseAnimation()
 
-        val currentStepIndex = ((steps.size - 1) * progress).roundToInt()
-        ProxyLogger.debug(tag, "changeAnimationProgress() currentStepIndex: $currentStepIndex")
+        val newStepIndex = ((steps.size - 1) * progress).roundToInt()
+        ProxyLogger.debug(tag, "changeAnimationProgress() currentStepIndex: $newStepIndex")
         ProxyLogger.debug(tag, "changeAnimationProgress() stepIndex before comparing: $stepIndex")
-        if (currentStepIndex < stepIndex) {
+        if (newStepIndex < stepIndex) {
             resetItems() // inverted handleStep() is not implemented
         }
         ProxyLogger.debug(tag, "changeAnimationProgress() stepIndex after comparing: $stepIndex")
-        while (stepIndex < currentStepIndex) {
+        while (stepIndex < newStepIndex) {
             handleStep(animate = false)
 
             stepIndex++
@@ -388,12 +404,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
         sortingArrayCopy.forEachIndexed { index, value ->
             sortingItemsStates[index]
                 .changeTitle(value.toString())
-                .forcePosition(
-                    startPosition = startOfView + itemSize * index,
-                    topPosition = topOfView
-                )
-                .forceStrokeWidth(defaultStrokeWidth)
-                .changeStrokeColor(defaultStrokeColor)
+                .changeBgColor(defaultStrokeColor)
+                .forceValue(SortingItemState.AnimationKey.StartPosition, startOfView + itemSize * index)
+                .forceValue(SortingItemState.AnimationKey.TopPosition, topOfView)
+                .forceValue(SortingItemState.AnimationKey.SelectedSize, 0f)
+                .forceValue(SortingItemState.AnimationKey.StrokeWidth, defaultStrokeWidth)
         }
     }
 
@@ -419,22 +434,14 @@ class SortingAlgorithmView(context: Context) : View(context) {
             val index = indices[pointer]
 
             if (index in statesIndices) {
-                val (strokeWidth, strokeColor) = when (decorator) {
-                    SortingItemDecorator.SELECTED -> selectedStrokeWidth to selectedStrokeColor
-                    SortingItemDecorator.EMPTY -> defaultStrokeWidth to defaultStrokeColor
+                val itemSize = when (decorator) {
+                    SortingItemDecorator.SELECTED -> itemSize
+                    SortingItemDecorator.EMPTY -> 0f
                 }
 
                 when {
-                    animate -> {
-                        sortingItemsStates[index]
-                            .addStrokeWidth(strokeWidth)
-                            .changeStrokeColor(strokeColor)
-                    }
-                    else -> {
-                        sortingItemsStates[index]
-                            .forceStrokeWidth(strokeWidth)
-                            .changeStrokeColor(strokeColor)
-                    }
+                    animate -> sortingItemsStates[index].addValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
+                    else -> sortingItemsStates[index].forceValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
                 }
 
                 isUpdated = true
@@ -456,19 +463,32 @@ class SortingAlgorithmView(context: Context) : View(context) {
             sortingState1.cancelAnimation()
             sortingState2.cancelAnimation()
 
-            val firstStartPosition = sortingState1.startPosition()
-            val secondStartPosition = sortingState2.startPosition()
+            val startPosition1 = sortingState1.value(SortingItemState.AnimationKey.StartPosition)
+            val startPosition2 = sortingState2.value(SortingItemState.AnimationKey.StartPosition)
+            val topPosition1 = sortingState1.value(SortingItemState.AnimationKey.TopPosition)
+            val topPosition2 = sortingState2.value(SortingItemState.AnimationKey.TopPosition)
 
             when {
                 animate -> {
                     sortingState1
-                        .addPosition(topPosition = sortingState1.topPosition() - itemSize)
-                        .addPosition(startPosition = secondStartPosition)
-                        .addPosition(topPosition = sortingState1.topPosition() + itemSize)
+                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1 - itemSize)
+                        .addLastValue(SortingItemState.AnimationKey.StartPosition)
+
+                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1 - itemSize)
+                        .addValue(SortingItemState.AnimationKey.StartPosition, startPosition2)
+
+                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1)
+                        .addLastValue(SortingItemState.AnimationKey.StartPosition)
+
                     sortingState2
-                        .addPosition(topPosition = sortingState2.topPosition() + itemSize)
-                        .addPosition(startPosition = firstStartPosition)
-                        .addPosition(topPosition = sortingState2.topPosition() - itemSize)
+                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2 + itemSize)
+                        .addLastValue(SortingItemState.AnimationKey.StartPosition)
+
+                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2 + itemSize)
+                        .addValue(SortingItemState.AnimationKey.StartPosition, startPosition1)
+
+                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2)
+                        .addLastValue(SortingItemState.AnimationKey.StartPosition)
 
                     sortingState1.addOnAnimationEnd {
                         sortingItemsStates[index1] = sortingState2
@@ -479,8 +499,9 @@ class SortingAlgorithmView(context: Context) : View(context) {
                     }
                 }
                 else -> {
-                    sortingState1.forcePosition(startPosition = secondStartPosition)
-                    sortingState2.forcePosition(startPosition = firstStartPosition)
+                    sortingState1.forceValue(SortingItemState.AnimationKey.StartPosition, startPosition2)
+                    sortingState2.forceValue(SortingItemState.AnimationKey.StartPosition, startPosition1)
+
                     sortingItemsStates[index1] = sortingState2
                     sortingItemsStates[index2] = sortingState1
                 }
@@ -496,30 +517,31 @@ class SortingAlgorithmView(context: Context) : View(context) {
         if (dividerIndex in sortingItemsStates.indices) {
             var index = 0
 
-            var topPosition = sortingItemsStates[dividerIndex].topPosition()
+            var topPosition = sortingItemsStates[dividerIndex].value(SortingItemState.AnimationKey.TopPosition)
             if ((topPosition + 2 * itemSize) >= measuredHeight) {
                 topPosition = paddingTop.toFloat()
-                sortingItemsStates.forEach {
-                    it.addPosition(topPosition = topPosition)
-                }
+
+                moveItemsToTopPosition(topPosition)
             }
 
             val newTopPosition = topPosition + itemSize + itemMargin * 2
             while (index < dividerIndex) {
                 val state = sortingItemsStates[index]
-                state.addPosition(
-                    startPosition = state.startPosition() - itemMargin / 2,
-                    topPosition = newTopPosition
-                )
+
+                val lastStartPosition = state.value(SortingItemState.AnimationKey.StartPosition)
+                state
+                    .addValue(SortingItemState.AnimationKey.StartPosition, lastStartPosition - itemMargin / 2)
+                    .addValue(SortingItemState.AnimationKey.TopPosition, newTopPosition)
+
                 index++
             }
 
             while (index < sortingItemsStates.size) {
                 val state = sortingItemsStates[index]
-                state.addPosition(
-                    startPosition = state.startPosition() + itemMargin / 2,
-                    topPosition = newTopPosition
-                )
+                val lastStartPosition = state.value(SortingItemState.AnimationKey.StartPosition)
+                state
+                    .addValue(SortingItemState.AnimationKey.StartPosition, lastStartPosition + itemMargin / 2)
+                    .addValue(SortingItemState.AnimationKey.TopPosition, newTopPosition)
 
                 index++
             }
@@ -530,22 +552,32 @@ class SortingAlgorithmView(context: Context) : View(context) {
         return false
     }
 
-    private fun moveItem(currentIndex: Int, newIndex: Int) {
+    private fun moveItem(currentIndex: Int, newIndex: Int): Boolean {
         val indices = sortingItemsStates.indices
         if (currentIndex in indices && newIndex in indices) {
             val state = sortingItemsStates[currentIndex]
-            var topPosition = state.topPosition()
+            var topPosition = state.value(SortingItemState.AnimationKey.TopPosition)
             if ((topPosition + 2 * itemSize) >= measuredHeight) {
                 topPosition = paddingTop.toFloat()
-                sortingItemsStates.forEach {
-                    it.addPosition(topPosition = topPosition)
-                }
+                moveItemsToTopPosition(topPosition)
             }
 
-            state.addPosition(
-                startPosition = sortingItemsStates[newIndex].startPosition(),
-                topPosition = topPosition + itemSize + itemMargin * 2
-            )
+            val newStartPosition = sortingItemsStates[newIndex].value(SortingItemState.AnimationKey.StartPosition)
+            state
+                .addValue(SortingItemState.AnimationKey.StartPosition, newStartPosition)
+                .addValue(SortingItemState.AnimationKey.TopPosition, topPosition + itemSize + itemMargin * 2)
+
+            return true
+        }
+
+        return false
+    }
+
+    private fun moveItemsToTopPosition(position: Float) {
+        sortingItemsStates.forEach { state ->
+            state
+                .addLastValue(SortingItemState.AnimationKey.StartPosition)
+                .addValue(SortingItemState.AnimationKey.TopPosition, position)
         }
     }
 

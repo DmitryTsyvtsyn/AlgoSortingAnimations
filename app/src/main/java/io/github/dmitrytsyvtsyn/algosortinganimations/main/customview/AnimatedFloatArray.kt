@@ -3,43 +3,43 @@ package io.github.dmitrytsyvtsyn.algosortinganimations.main.customview
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class AnimatedFloatArray(private val array: FloatArray) {
+class AnimatedFloatArray(private val array: FloatArray): AnimatedArray<Float> {
 
     private val tag = "AnimatedFloatArray"
 
     private var pushPointer = 0
 
-    val size: Int
+    override val size: Int
         get() = pushPointer
 
-    fun forcePush(float: Float) {
+    override fun forcePush(value: Float) {
         if (array.isEmpty()) error("The array is out of bounds, array size is 0")
 
-        array[0] = float
+        array[0] = value
         pushPointer = 1
     }
 
-    fun push(float: Float) {
+    override fun push(value: Float) {
         if (pushPointer >= array.size) error("The array is out of bounds, array -> $array, index -> $pushPointer")
 
-        array[pushPointer] = float
+        array[pushPointer] = value
 
         pushPointer += 1
     }
 
-    fun reset() {
+    override fun reset() {
         if (pushPointer > 1) {
             pushPointer = 1
         }
     }
 
-    fun peek(): Float {
+    override fun peek(): Float {
         if (pushPointer == 0) error("The array is empty!")
 
         return array[pushPointer - 1]
     }
 
-    fun pop(fraction: Float): Float {
+    override fun pop(fraction: Float): Float {
         if (pushPointer == 0) error("The array is empty!")
 
         if (pushPointer == 1) {
@@ -60,10 +60,10 @@ class AnimatedFloatArray(private val array: FloatArray) {
         
         val progressFraction = progress - floor(progress)
 
-        return lerp(previousValue, nextValue, progressFraction)
+        return linearInterpolation(previousValue, nextValue, progressFraction)
     }
 
-    private fun lerp(start: Float, end: Float, fraction: Float): Float {
+    private fun linearInterpolation(start: Float, end: Float, fraction: Float): Float {
         return start + fraction * (end - start)
     }
 
