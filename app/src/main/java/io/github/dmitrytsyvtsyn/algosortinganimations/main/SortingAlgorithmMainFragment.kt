@@ -247,6 +247,7 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
             strokeColor = theme.colors[ColorAttributes.primaryColor],
             selectedStrokeColor = theme.colors[ColorAttributes.primaryDarkColor],
             textColor = theme.colors[ColorAttributes.primaryTextColor],
+            selectedTextColor = theme.colors[ColorAttributes.colorOnPrimary],
             typeface = TypefaceManager.typeface(TypefacePath.MEDIUM)
         )
 

@@ -43,11 +43,14 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private var itemSize = 48.dpf
     private var itemMargin = 8.dpf
     private var itemRadius = 8.dpf
+    private var defaultTextColor = 0xff000000.toInt()
+    private var selectedTextColor = 0xffffffff.toInt()
 
     private val itemPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
     }
     private val textPaint = TextPaint().apply {
+        color = defaultTextColor
         textSize = 19.sp
     }
     private val textBounds = Rect()
@@ -157,6 +160,8 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 itemPaint.style = Paint.Style.STROKE
             }
 
+            val textColor = state.animatedValue(SortingItemState.AnimationKey.TextColor, selectionAnimationFraction)
+            textPaint.color = textColor
             val text = state.title
             textPaint.getTextBounds(text, 0, text.length, textBounds)
             val textWidth = textBounds.width()
@@ -199,7 +204,8 @@ class SortingAlgorithmView(context: Context) : View(context) {
         selectedStrokeWidth: Float = this.selectedStrokeWidth,
         strokeColor: Int = this.defaultStrokeColor,
         selectedStrokeColor: Int = this.selectedStrokeColor,
-        textColor: Int = this.textPaint.color,
+        textColor: Int = this.defaultTextColor,
+        selectedTextColor: Int = this.selectedTextColor,
         textSize: Float = this.textPaint.textSize,
         typeface: Typeface = this.textPaint.typeface,
         selectionAnimationDuration: Long = this.selectionAnimationDuration,
@@ -222,7 +228,9 @@ class SortingAlgorithmView(context: Context) : View(context) {
         this.defaultStrokeColor = strokeColor
         this.selectedStrokeColor = selectedStrokeColor
 
-        this.textPaint.color = textColor
+        this.defaultTextColor = textColor
+        this.selectedTextColor = selectedTextColor
+
         this.textPaint.textSize = textSize
         this.textPaint.typeface = typeface
 
@@ -288,12 +296,12 @@ class SortingAlgorithmView(context: Context) : View(context) {
             resetItems() // inverted handleStep() is not implemented
         }
         ProxyLogger.debug(tag, "changeAnimationProgress() stepIndex after comparing: $stepIndex")
+        sortingItemsStates.forEach { state -> state.validate() }
         while (stepIndex < newStepIndex) {
-            handleStep(animate = false)
-
             stepIndex++
+
+            handleStep(animate = false)
         }
-        handleStep(animate = false)
         ProxyLogger.debug(tag, "changeAnimationProgress() stepIndex after while cycle: $stepIndex")
 
         if (isAnimationWasStarted) {
@@ -409,6 +417,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 .forceValue(SortingItemState.AnimationKey.TopPosition, topOfView)
                 .forceValue(SortingItemState.AnimationKey.SelectedSize, 0f)
                 .forceValue(SortingItemState.AnimationKey.StrokeWidth, defaultStrokeWidth)
+                .forceValue(SortingItemState.AnimationKey.TextColor, defaultTextColor)
         }
     }
 
@@ -434,14 +443,22 @@ class SortingAlgorithmView(context: Context) : View(context) {
             val index = indices[pointer]
 
             if (index in statesIndices) {
-                val itemSize = when (decorator) {
-                    SortingItemDecorator.SELECTED -> itemSize
-                    SortingItemDecorator.EMPTY -> 0f
+                val (itemSize, textColor) = when (decorator) {
+                    SortingItemDecorator.SELECTED -> itemSize to selectedTextColor
+                    SortingItemDecorator.EMPTY -> 0f to defaultTextColor
                 }
 
                 when {
-                    animate -> sortingItemsStates[index].addValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
-                    else -> sortingItemsStates[index].forceValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
+                    animate -> {
+                        sortingItemsStates[index]
+                            .addValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
+                            .addValue(SortingItemState.AnimationKey.TextColor, textColor)
+                    }
+                    else -> {
+                        sortingItemsStates[index]
+                            .forceValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
+                            .forceValue(SortingItemState.AnimationKey.TextColor, textColor)
+                    }
                 }
 
                 isUpdated = true

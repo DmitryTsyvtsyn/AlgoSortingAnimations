@@ -1,16 +1,18 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.customview
 
-
 class SortingItemState(
     private var text: String = "",
     private var bgColor: Int = 0
 ) {
 
+    private var isValid = true
+
     private val animatedProperties: Array<AnimatedArray<*>> = arrayOf(
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
-        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f))
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
+        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0))
     )
 
     val title: String
@@ -26,10 +28,12 @@ class SortingItemState(
 
     private var animationEndListener: (() -> Unit)? = null
     fun addOnAnimationEnd(listener: () -> Unit) {
+        isValid = false
         animationEndListener = listener
     }
 
     fun <T> forceValue(key: AnimationKey<T>, value: T): SortingItemState {
+        isValid = true
         animationEndListener = null
         (animatedProperties[key.key] as AnimatedArray<T>).forcePush(value)
         return this
@@ -67,6 +71,20 @@ class SortingItemState(
     }
     fun bgColor() = bgColor
 
+    fun validate() {
+        if (isValid) return
+
+        finishAnimation()
+        checkAnimationEndedListener()
+        isValid = true
+    }
+
+    private fun finishAnimation() {
+        if (isAnimationRunning) {
+            animatedProperties.forEach { animatedArray -> animatedArray.pop(1f) }
+        }
+    }
+
     private fun checkAnimationEndedListener() {
         if (!isAnimationRunning) {
             animationEndListener?.invoke()
@@ -75,10 +93,11 @@ class SortingItemState(
     }
 
     sealed class AnimationKey<T>(val key: Int) {
-        object StartPosition : AnimationKey<Float>(0)
-        object TopPosition : AnimationKey<Float>(1)
-        object StrokeWidth : AnimationKey<Float>(2)
-        object SelectedSize : AnimationKey<Float>(3)
+        data object StartPosition : AnimationKey<Float>(0)
+        data object TopPosition : AnimationKey<Float>(1)
+        data object StrokeWidth : AnimationKey<Float>(2)
+        data object SelectedSize : AnimationKey<Float>(3)
+        data object TextColor : AnimationKey<Int>(4)
     }
 
 }

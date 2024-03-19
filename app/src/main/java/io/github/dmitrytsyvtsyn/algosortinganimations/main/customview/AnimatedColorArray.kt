@@ -1,25 +1,24 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.customview
 
+import androidx.core.graphics.ColorUtils
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class AnimatedFloatArray(private val array: FloatArray): AnimatedArray<Float> {
-
-    private val tag = "AnimatedFloatArray"
+class AnimatedColorArray(private val array: IntArray): AnimatedArray<Int> {
 
     private var pushPointer = 0
 
     override val size: Int
         get() = pushPointer
 
-    override fun forcePush(value: Float) {
+    override fun forcePush(value: Int) {
         if (array.isEmpty()) error("The array is out of bounds, array size is 0")
 
         array[0] = value
         pushPointer = 1
     }
 
-    override fun push(value: Float) {
+    override fun push(value: Int) {
         if (pushPointer >= array.size) error("The array is out of bounds, array -> $array, index -> $pushPointer")
 
         array[pushPointer] = value
@@ -33,13 +32,13 @@ class AnimatedFloatArray(private val array: FloatArray): AnimatedArray<Float> {
         }
     }
 
-    override fun peek(): Float {
+    override fun peek(): Int {
         if (pushPointer == 0) error("The array is empty!")
 
         return array[pushPointer - 1]
     }
 
-    override fun pop(fraction: Float): Float {
+    override fun pop(fraction: Float): Int {
         if (pushPointer == 0) error("The array is empty!")
 
         if (pushPointer == 1) {
@@ -55,18 +54,14 @@ class AnimatedFloatArray(private val array: FloatArray): AnimatedArray<Float> {
 
         val progress = fraction / (1f / (pushPointer - 1))
 
-        val startValue = array[floor(progress).toInt()]
-        val endValue = array[ceil(progress).toInt()]
-        
-        if (endValue == startValue) return endValue
-        
-        val progressFraction = progress - floor(progress)
-        
-        return linearInterpolation(startValue, endValue, progressFraction)
-    }
+        val startColor = array[floor(progress).toInt()]
+        val endColor = array[ceil(progress).toInt()]
 
-    private fun linearInterpolation(start: Float, end: Float, fraction: Float): Float {
-        return start + fraction * (end - start)
+        if (endColor == startColor) return endColor
+
+        val ratio = progress - floor(progress)
+        
+        return ColorUtils.blendARGB(startColor, endColor, ratio)
     }
 
 }
