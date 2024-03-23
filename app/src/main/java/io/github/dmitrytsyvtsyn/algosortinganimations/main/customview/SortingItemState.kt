@@ -5,8 +5,6 @@ class SortingItemState(
     private var bgColor: Int = 0
 ) {
 
-    private var isValid = true
-
     private val animatedProperties: Array<AnimatedArray<*>> = arrayOf(
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
@@ -21,20 +19,15 @@ class SortingItemState(
     val isAnimationRunning: Boolean
         get() = animatedProperties.any { it.size > 1 }
 
-    fun cancelAnimation(): SortingItemState {
-        animatedProperties.forEach { it.reset() }
-        return this
-    }
-
-    private var animationEndListener: (() -> Unit)? = null
-    fun addOnAnimationEnd(listener: () -> Unit) {
-        isValid = false
-        animationEndListener = listener
+    fun finishAnimation(): Boolean {
+        if (isAnimationRunning) {
+            animatedProperties.forEach { animatedArray -> animatedArray.pop(1f) }
+            return true
+        }
+        return false
     }
 
     fun <T> forceValue(key: AnimationKey<T>, value: T): SortingItemState {
-        isValid = true
-        animationEndListener = null
         (animatedProperties[key.key] as AnimatedArray<T>).forcePush(value)
         return this
     }
@@ -56,7 +49,6 @@ class SortingItemState(
     }
 
     fun <T> animatedValue(key: AnimationKey<T>, fraction: Float): T {
-        checkAnimationEndedListener()
         return (animatedProperties[key.key] as AnimatedArray<T>).pop(fraction)
     }
 
@@ -70,27 +62,6 @@ class SortingItemState(
         return this
     }
     fun bgColor() = bgColor
-
-    fun validate() {
-        if (isValid) return
-
-        finishAnimation()
-        checkAnimationEndedListener()
-        isValid = true
-    }
-
-    private fun finishAnimation() {
-        if (isAnimationRunning) {
-            animatedProperties.forEach { animatedArray -> animatedArray.pop(1f) }
-        }
-    }
-
-    private fun checkAnimationEndedListener() {
-        if (!isAnimationRunning) {
-            animationEndListener?.invoke()
-            animationEndListener = null
-        }
-    }
 
     sealed class AnimationKey<T>(val key: Int) {
         data object StartPosition : AnimationKey<Float>(0)

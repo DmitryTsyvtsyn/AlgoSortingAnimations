@@ -26,4 +26,8 @@ sealed class SortingAlgorithmStep(val titleResource: String) {
             "End(titleResource=$titleResource)"
     }
 
+    object Empty : SortingAlgorithmStep("")  {
+        override fun toString() = "Empty"
+    }
+
 }

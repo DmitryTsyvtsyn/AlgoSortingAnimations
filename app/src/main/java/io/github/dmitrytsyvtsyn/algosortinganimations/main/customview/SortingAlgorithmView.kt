@@ -9,7 +9,6 @@ import android.graphics.Typeface
 import android.os.SystemClock
 import android.text.TextPaint
 import android.view.View
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.logger.ProxyLogger
 import kotlin.math.roundToInt
 
 class SortingAlgorithmView(context: Context) : View(context) {
@@ -58,7 +57,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private val sortingItemsStates = mutableListOf<SortingItemState>()
     private var sortingArrayCopy = intArrayOf()
 
-    private var stepIndex = 0
+    private var stepIndex = -1
     private var stepListener: (Int, SortingAlgorithmStep) -> Unit = { _, _ -> }
     private val steps = mutableListOf<SortingAlgorithmStep>(SortingAlgorithmStep.End(""))
 
@@ -70,11 +69,12 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private var startOfView = 0f
     private var topOfView = 0f
 
-    private val startAnimationDelayedRunnable = Runnable { startAnimation() }
+    private val restartAnimationDelayedRunnable = Runnable { stopAnimation(); startAnimation() }
+
+    private val emptyStepFinishAction = { false }
+    private var stepFinishAction: () -> Boolean = emptyStepFinishAction
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        ProxyLogger.debug(tag, "onMeasure() called")
-
         val statesSize = sortingItemsStates.size
 
         var measuredWidth = (paddingStart + itemSize * statesSize + itemMargin * statesSize + paddingEnd).roundToInt()
@@ -181,15 +181,10 @@ class SortingAlgorithmView(context: Context) : View(context) {
         }
 
         if (animationState == SortingAnimationState.ANIMATION_RUNNING) {
-            if (haveItemsAnimation) {
-                if (isAnimationEnabled) postInvalidateOnAnimation() else invalidate()
-                return
-            }
-
-            if (stepIndex < steps.size - 1) {
-                pausedAnimationDifference = 0L
-                stepIndex += 1
-                handleStep()
+            when {
+                haveItemsAnimation && isAnimationEnabled -> postInvalidateOnAnimation()
+                haveItemsAnimation -> invalidate()
+                else -> changeAnimationProgress(1)
             }
         }
     }
@@ -216,8 +211,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
         itemMargin: Float = this.itemMargin,
         itemRadius: Float = this.itemRadius
     ) {
-        ProxyLogger.debug(tag, "changeParams() called")
-
         clearCallbacks()
 
         val pausedAnimation = pauseAnimation()
@@ -262,8 +255,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     fun changeAnimationSteps(newSteps: List<SortingAlgorithmStep>) {
-        ProxyLogger.debug(tag, "changeAnimationSteps($newSteps) called")
-
         if (newSteps.isEmpty()) throw IllegalArgumentException("The steps is empty")
 
         steps.clear(); steps.addAll(newSteps)
@@ -275,43 +266,50 @@ class SortingAlgorithmView(context: Context) : View(context) {
     fun changeAnimationProgress(numberOfSteps: Int) {
         val newStepIndex = stepIndex + numberOfSteps
 
-        if (newStepIndex < 0 || newStepIndex > steps.size - 1) return
+        if (newStepIndex < -1 || newStepIndex > steps.size - 1) return
 
-        changeAnimationProgress(newStepIndex / (steps.size - 1f))
+        changeAnimationProgressInternal(newStepIndex)
     }
 
-    // values: 0f..1f
+    // the progress range: 0f..1f
     fun changeAnimationProgress(progress: Float) {
-        ProxyLogger.debug(tag, "changeAnimationProgress($progress) called")
-
         if (progress < 0f || progress > 1f) throw IllegalArgumentException("The progress: $progress must have the range: 0f..1f")
         if (steps.isEmpty()) throw IllegalArgumentException("The steps is empty")
 
+        // the index range: -1..steps.size-1
+        val newStepIndex = (steps.size * progress).roundToInt() - 1
+
+        changeAnimationProgressInternal(newStepIndex)
+    }
+
+    private fun changeAnimationProgressInternal(newStepIndex: Int) {
         val isAnimationWasStarted = pauseAnimation()
 
-        val newStepIndex = ((steps.size - 1) * progress).roundToInt()
-        ProxyLogger.debug(tag, "changeAnimationProgress() currentStepIndex: $newStepIndex")
-        ProxyLogger.debug(tag, "changeAnimationProgress() stepIndex before comparing: $stepIndex")
+        // finish the current step animations
+        sortingItemsStates.forEach { state -> state.finishAnimation() }
+        pausedAnimationDifference = 0L
+        invokeStepFinishAction()
+
         if (newStepIndex < stepIndex) {
             resetItems() // inverted handleStep() is not implemented
         }
-        ProxyLogger.debug(tag, "changeAnimationProgress() stepIndex after comparing: $stepIndex")
-        sortingItemsStates.forEach { state -> state.validate() }
+
+        stepIndex++
         while (stepIndex < newStepIndex) {
-            stepIndex++
-
             handleStep(animate = false)
-        }
-        ProxyLogger.debug(tag, "changeAnimationProgress() stepIndex after while cycle: $stepIndex")
 
+            stepIndex++
+        }
+
+        // to animate the last applied step or not
         if (isAnimationWasStarted) {
             startAnimation()
+        } else {
+            handleStep(animate = false)
         }
     }
 
     fun changeArray(intArray: IntArray) {
-        ProxyLogger.debug(tag, "changeArray($intArray) called")
-
         checkArraySize(intArray); clearCallbacks()
 
         sortingArrayCopy = intArray.copyOf()
@@ -323,8 +321,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     fun startAnimation() {
-        ProxyLogger.debug(tag, "startAnimation() called")
-
         if (steps.isEmpty()) throw IllegalStateException("The steps list is empty!")
 
         if (animationState == SortingAnimationState.ANIMATION_RUNNING) return
@@ -334,16 +330,13 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     fun pauseAnimation(): Boolean {
-        ProxyLogger.debug(tag, "pauseAnimation() called")
-
         clearCallbacks()
 
         if (animationState == SortingAnimationState.ANIMATION_RUNNING) {
-            ProxyLogger.debug(tag, "pauseAnimation() returns true")
             animationState = SortingAnimationState.ANIMATION_PAUSED
             return true
         }
-        ProxyLogger.debug(tag, "pauseAnimation() returns false")
+
         return false
     }
 
@@ -360,12 +353,9 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     private fun handleStep(animate: Boolean = true) {
-        ProxyLogger.debug(tag, "handleStep($animate) called")
-        ProxyLogger.debug(tag, "handleStep() stepIndex: $stepIndex")
-
         clearCallbacks()
 
-        val step = steps[stepIndex]
+        val step = steps.getOrElse(stepIndex) { SortingAlgorithmStep.Empty }
         stepListener.invoke(stepIndex, step)
 
         when (step) {
@@ -382,11 +372,13 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 updateView(updated && animate)
             }
             is SortingAlgorithmStep.End -> {
-                val hasRunning = animationState == SortingAnimationState.ANIMATION_RUNNING
-                stopAnimation()
-                if (hasRunning && isRepeatableAnimation) {
-                    postDelayed(startAnimationDelayedRunnable, repeatableAnimationDuration)
+                val isRunning = animationState == SortingAnimationState.ANIMATION_RUNNING
+                if (isRunning && isRepeatableAnimation) {
+                    postDelayed(restartAnimationDelayedRunnable, repeatableAnimationDuration)
                 }
+            }
+            is SortingAlgorithmStep.Empty -> {
+                updateView(animate)
             }
         }
     }
@@ -402,12 +394,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     private fun resetItems() {
-        ProxyLogger.debug(tag, "resetItems() called")
-
         clearCallbacks()
 
+        stepFinishAction = emptyStepFinishAction
         pausedAnimationDifference = 0
-        stepIndex = 0
+        stepIndex = -1
 
         sortingArrayCopy.forEachIndexed { index, value ->
             sortingItemsStates[index]
@@ -422,8 +413,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
     }
 
     private fun clearCallbacks() {
-        ProxyLogger.debug(tag, "clearCallbacks() called")
-        removeCallbacks(startAnimationDelayedRunnable)
+        removeCallbacks(restartAnimationDelayedRunnable)
     }
 
     private fun decorateItems(
@@ -431,8 +421,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
         indices: IntArray,
         animate: Boolean = true
     ) : Boolean {
-        ProxyLogger.debug(tag, "decorateItems($decorator, ${indices.toList()}, $animate) called")
-
         val statesIndices = sortingItemsStates.indices
 
         var isUpdated = false
@@ -477,9 +465,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
             val sortingState1 = sortingItemsStates[index1]
             val sortingState2 = sortingItemsStates[index2]
 
-            sortingState1.cancelAnimation()
-            sortingState2.cancelAnimation()
-
             val startPosition1 = sortingState1.value(SortingItemState.AnimationKey.StartPosition)
             val startPosition2 = sortingState2.value(SortingItemState.AnimationKey.StartPosition)
             val topPosition1 = sortingState1.value(SortingItemState.AnimationKey.TopPosition)
@@ -507,12 +492,10 @@ class SortingAlgorithmView(context: Context) : View(context) {
                         .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2)
                         .addLastValue(SortingItemState.AnimationKey.StartPosition)
 
-                    sortingState1.addOnAnimationEnd {
+                    stepFinishAction = {
                         sortingItemsStates[index1] = sortingState2
-                    }
-
-                    sortingState2.addOnAnimationEnd {
                         sortingItemsStates[index2] = sortingState1
+                        true
                     }
                 }
                 else -> {
@@ -528,6 +511,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
         }
 
         return false
+    }
+
+    private fun invokeStepFinishAction() {
+        stepFinishAction.invoke()
+        stepFinishAction = emptyStepFinishAction
     }
 
     private fun divideItems(dividerIndex: Int): Boolean {
