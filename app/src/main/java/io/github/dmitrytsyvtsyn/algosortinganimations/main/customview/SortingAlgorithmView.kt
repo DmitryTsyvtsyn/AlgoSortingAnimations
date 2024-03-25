@@ -355,42 +355,172 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private fun handleStep(animate: Boolean = true) {
         clearCallbacks()
 
-        val step = steps.getOrElse(stepIndex) { SortingAlgorithmStep.Empty }
+        val step = steps.fetchCurrentOrEmptyStep(stepIndex)
         stepListener.invoke(stepIndex, step)
 
-        when (step) {
-            is SortingAlgorithmStep.Swap -> {
-                val updated = swapItems(step.index1, step.index2, animate)
-                updateView(updated && animate)
+        val status = when (step) {
+            is SortingAlgorithmStep.Swap -> handleStep(step, animate)
+            is SortingAlgorithmStep.Select -> handleStep(step, animate)
+            is SortingAlgorithmStep.Unselect -> handleStep(step, animate)
+            is SortingAlgorithmStep.End -> handleStep(step, animate)
+            is SortingAlgorithmStep.Empty -> handleStep(step, animate)
+        }
+
+        when (status) {
+            HandleStepStatus.ANIMATION_INVALIDATE -> {
+                currentAnimationTime = SystemClock.uptimeMillis() - pausedAnimationDifference
+                postInvalidateOnAnimation()
             }
-            is SortingAlgorithmStep.Select -> {
-                val updated = decorateItems(SortingItemDecorator.SELECTED, step.indices, animate)
-                updateView(updated && animate)
+            HandleStepStatus.JUST_INVALIDATE -> {
+                currentAnimationTime = 0
+                invalidate()
             }
-            is SortingAlgorithmStep.Unselect -> {
-                val updated = decorateItems(SortingItemDecorator.EMPTY, step.indices, animate)
-                updateView(updated && animate)
+            HandleStepStatus.NOT_INVALIDATE -> {
+                // nothing to do
             }
-            is SortingAlgorithmStep.End -> {
-                val isRunning = animationState == SortingAnimationState.ANIMATION_RUNNING
-                if (isRunning && isRepeatableAnimation) {
-                    postDelayed(restartAnimationDelayedRunnable, repeatableAnimationDuration)
-                }
-            }
-            is SortingAlgorithmStep.Empty -> {
-                updateView(animate)
+            HandleStepStatus.ERROR_INVALIDATE -> {
+                throw IllegalStateException("The step ${steps[stepIndex]} has invalid field values")
             }
         }
     }
 
-    private fun updateView(animate: Boolean) {
-        if (animate) {
-            currentAnimationTime = SystemClock.uptimeMillis() - pausedAnimationDifference
-            postInvalidateOnAnimation()
-        } else {
-            currentAnimationTime = 0
-            invalidate()
+    private fun handleStep(step: SortingAlgorithmStep.Select, animate: Boolean = true): HandleStepStatus {
+        val selectedIndices = step.indices
+        val totalIndices = sortingItemsStates.indices
+
+        var handleStepStatus = HandleStepStatus.ERROR_INVALIDATE
+
+        selectedIndices.forEach { index ->
+            if (index in totalIndices) {
+                when {
+                    animate -> {
+                        sortingItemsStates[index]
+                            .addValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
+                            .addValue(SortingItemState.AnimationKey.TextColor, selectedTextColor)
+
+                        handleStepStatus = HandleStepStatus.ANIMATION_INVALIDATE
+                    }
+                    else -> {
+                        sortingItemsStates[index]
+                            .forceValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
+                            .forceValue(SortingItemState.AnimationKey.TextColor, selectedTextColor)
+
+                        handleStepStatus = HandleStepStatus.JUST_INVALIDATE
+                    }
+                }
+            }
         }
+
+        return handleStepStatus
+    }
+
+    private fun handleStep(step: SortingAlgorithmStep.Unselect, animate: Boolean = true): HandleStepStatus {
+        val selectedIndices = step.indices
+        val totalIndices = sortingItemsStates.indices
+
+        var handleStepStatus = HandleStepStatus.ERROR_INVALIDATE
+
+        selectedIndices.forEach { index ->
+            if (index in totalIndices) {
+                when {
+                    animate -> {
+                        sortingItemsStates[index]
+                            .addValue(SortingItemState.AnimationKey.SelectedSize, 0f)
+                            .addValue(SortingItemState.AnimationKey.TextColor, defaultTextColor)
+
+                        handleStepStatus = HandleStepStatus.ANIMATION_INVALIDATE
+                    }
+                    else -> {
+                        sortingItemsStates[index]
+                            .forceValue(SortingItemState.AnimationKey.SelectedSize, 0f)
+                            .forceValue(SortingItemState.AnimationKey.TextColor, defaultTextColor)
+
+                        handleStepStatus = HandleStepStatus.JUST_INVALIDATE
+                    }
+                }
+            }
+        }
+
+        return handleStepStatus
+    }
+
+    private fun handleStep(step: SortingAlgorithmStep.Swap, animate: Boolean = true): HandleStepStatus {
+        val index1 = step.index1
+        val index2 = step.index2
+        val totalIndices = sortingItemsStates.indices
+
+        if (index1 !in totalIndices && index2 !in totalIndices) return HandleStepStatus.ERROR_INVALIDATE
+
+        val sortingState1 = sortingItemsStates[index1]
+        val sortingState2 = sortingItemsStates[index2]
+
+        val startPosition1 = sortingState1.value(SortingItemState.AnimationKey.StartPosition)
+        val startPosition2 = sortingState2.value(SortingItemState.AnimationKey.StartPosition)
+        val topPosition1 = sortingState1.value(SortingItemState.AnimationKey.TopPosition)
+        val topPosition2 = sortingState2.value(SortingItemState.AnimationKey.TopPosition)
+
+        return when {
+            animate -> {
+                sortingState1
+                    .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1 - itemSize)
+                    .addLastValue(SortingItemState.AnimationKey.StartPosition)
+
+                    .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1 - itemSize)
+                    .addValue(SortingItemState.AnimationKey.StartPosition, startPosition2)
+
+                    .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1)
+                    .addLastValue(SortingItemState.AnimationKey.StartPosition)
+
+                sortingState2
+                    .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2 + itemSize)
+                    .addLastValue(SortingItemState.AnimationKey.StartPosition)
+
+                    .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2 + itemSize)
+                    .addValue(SortingItemState.AnimationKey.StartPosition, startPosition1)
+
+                    .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2)
+                    .addLastValue(SortingItemState.AnimationKey.StartPosition)
+
+                stepFinishAction = {
+                    sortingItemsStates[index1] = sortingState2
+                    sortingItemsStates[index2] = sortingState1
+                    true
+                }
+
+                HandleStepStatus.ANIMATION_INVALIDATE
+            }
+            else -> {
+                sortingState1.forceValue(SortingItemState.AnimationKey.StartPosition, startPosition2)
+                sortingState2.forceValue(SortingItemState.AnimationKey.StartPosition, startPosition1)
+
+                sortingItemsStates[index1] = sortingState2
+                sortingItemsStates[index2] = sortingState1
+
+                HandleStepStatus.JUST_INVALIDATE
+            }
+        }
+    }
+
+    private fun handleStep(step: SortingAlgorithmStep.End, animate: Boolean): HandleStepStatus {
+        if (animate && isRepeatableAnimation) {
+            postDelayed(restartAnimationDelayedRunnable, repeatableAnimationDuration)
+        }
+        return HandleStepStatus.NOT_INVALIDATE
+    }
+
+    private fun handleStep(step: SortingAlgorithmStep.Empty, animate: Boolean): HandleStepStatus {
+        if (animate) return HandleStepStatus.ANIMATION_INVALIDATE
+        return HandleStepStatus.JUST_INVALIDATE
+    }
+
+    private fun List<SortingAlgorithmStep>.fetchCurrentOrEmptyStep(index: Int): SortingAlgorithmStep {
+        if (index !in indices) return SortingAlgorithmStep.Empty
+        return get(index)
+    }
+
+    private fun invokeStepFinishAction() {
+        stepFinishAction.invoke()
+        stepFinishAction = emptyStepFinishAction
     }
 
     private fun resetItems() {
@@ -414,108 +544,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
     private fun clearCallbacks() {
         removeCallbacks(restartAnimationDelayedRunnable)
-    }
-
-    private fun decorateItems(
-        decorator: SortingItemDecorator,
-        indices: IntArray,
-        animate: Boolean = true
-    ) : Boolean {
-        val statesIndices = sortingItemsStates.indices
-
-        var isUpdated = false
-
-        val indicesCount = indices.size
-        var pointer = 0
-        while (pointer < indicesCount) {
-            val index = indices[pointer]
-
-            if (index in statesIndices) {
-                val (itemSize, textColor) = when (decorator) {
-                    SortingItemDecorator.SELECTED -> itemSize to selectedTextColor
-                    SortingItemDecorator.EMPTY -> 0f to defaultTextColor
-                }
-
-                when {
-                    animate -> {
-                        sortingItemsStates[index]
-                            .addValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
-                            .addValue(SortingItemState.AnimationKey.TextColor, textColor)
-                    }
-                    else -> {
-                        sortingItemsStates[index]
-                            .forceValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
-                            .forceValue(SortingItemState.AnimationKey.TextColor, textColor)
-                    }
-                }
-
-                isUpdated = true
-            }
-
-            pointer++
-        }
-
-        return isUpdated
-    }
-
-    private fun swapItems(index1: Int, index2: Int, animate: Boolean = true): Boolean {
-        val indices = sortingItemsStates.indices
-
-        if (index1 in indices && index2 in indices) {
-            val sortingState1 = sortingItemsStates[index1]
-            val sortingState2 = sortingItemsStates[index2]
-
-            val startPosition1 = sortingState1.value(SortingItemState.AnimationKey.StartPosition)
-            val startPosition2 = sortingState2.value(SortingItemState.AnimationKey.StartPosition)
-            val topPosition1 = sortingState1.value(SortingItemState.AnimationKey.TopPosition)
-            val topPosition2 = sortingState2.value(SortingItemState.AnimationKey.TopPosition)
-
-            when {
-                animate -> {
-                    sortingState1
-                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1 - itemSize)
-                        .addLastValue(SortingItemState.AnimationKey.StartPosition)
-
-                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1 - itemSize)
-                        .addValue(SortingItemState.AnimationKey.StartPosition, startPosition2)
-
-                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition1)
-                        .addLastValue(SortingItemState.AnimationKey.StartPosition)
-
-                    sortingState2
-                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2 + itemSize)
-                        .addLastValue(SortingItemState.AnimationKey.StartPosition)
-
-                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2 + itemSize)
-                        .addValue(SortingItemState.AnimationKey.StartPosition, startPosition1)
-
-                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2)
-                        .addLastValue(SortingItemState.AnimationKey.StartPosition)
-
-                    stepFinishAction = {
-                        sortingItemsStates[index1] = sortingState2
-                        sortingItemsStates[index2] = sortingState1
-                        true
-                    }
-                }
-                else -> {
-                    sortingState1.forceValue(SortingItemState.AnimationKey.StartPosition, startPosition2)
-                    sortingState2.forceValue(SortingItemState.AnimationKey.StartPosition, startPosition1)
-
-                    sortingItemsStates[index1] = sortingState2
-                    sortingItemsStates[index2] = sortingState1
-                }
-            }
-
-            return true
-        }
-
-        return false
-    }
-
-    private fun invokeStepFinishAction() {
-        stepFinishAction.invoke()
-        stepFinishAction = emptyStepFinishAction
     }
 
     private fun divideItems(dividerIndex: Int): Boolean {
@@ -601,6 +629,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
         ANIMATION_PAUSED
     }
 
-    private enum class SortingItemDecorator { SELECTED, EMPTY }
+    private enum class HandleStepStatus {
+        ANIMATION_INVALIDATE,
+        JUST_INVALIDATE,
+        NOT_INVALIDATE,
+        ERROR_INVALIDATE
+    }
 
 }
