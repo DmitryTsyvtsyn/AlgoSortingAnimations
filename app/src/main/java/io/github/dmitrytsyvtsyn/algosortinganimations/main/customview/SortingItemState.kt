@@ -1,15 +1,16 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.customview
 
-class SortingItemState(
-    private var text: String = "",
-    private var bgColor: Int = 0
-) {
+class SortingItemState {
+
+    private var text: String = ""
 
     private val animatedProperties: Array<AnimatedArray<*>> = arrayOf(
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
         AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
+        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0)),
+        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0)),
         AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0))
     )
 
@@ -57,18 +58,14 @@ class SortingItemState(
         return this
     }
 
-    fun changeBgColor(color: Int): SortingItemState {
-        bgColor = color
-        return this
-    }
-    fun bgColor() = bgColor
-
     sealed class AnimationKey<T>(val key: Int) {
         data object StartPosition : AnimationKey<Float>(0)
         data object TopPosition : AnimationKey<Float>(1)
         data object StrokeWidth : AnimationKey<Float>(2)
         data object SelectedSize : AnimationKey<Float>(3)
         data object TextColor : AnimationKey<Int>(4)
+        data object StrokeColor : AnimationKey<Int>(5)
+        data object BackgroundColor : AnimationKey<Int>(6)
     }
 
 }

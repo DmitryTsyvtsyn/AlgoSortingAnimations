@@ -11,15 +11,19 @@
     <string name="average_time">Average time:</string>
     <string name="worst_case_space">Worst-case space:</string>
     <string name="number_step">%1$d-й шаг: %2$s</string>
-    <string name="comparing_number">Сравниваем число %1$d с числом %2$d</string>
-    <string name="array_was_sorted_0">Массив отсортирован!</string>
-    <string name="array_was_sorted_1">Так как не было ни одной перестановки, значит массив уже отсортирован!</string>
-    <string name="swaping_numbers">Меняем местами %1$d и %2$d потому что число %3$d больше числа %4$d</string>
-    <string name="numbers_are_ordered">Числа %1$d и %2$d следуют в правильном порядке</string>
-    <string name="numbers_was_replaced">Числа %1$d и %2$d успешно поменялись местами</string>
+    <string name="array_was_sorted">Массив отсортирован!</string>
     <string name="random">Random</string>
     <string name="sorted">Sorted</string>
     <string name="ok">OK</string>
     <string name="array_size">Array size:</string>
     <string name="sorting_algorithms">Sorting algorithms</string>
+
+    <!-- Bubble sort -->
+    <string name="bubble_sort_comparing_number">Сравниваем число %1$d с числом %2$d</string>
+    <string name="bubble_sort_array_was_sorted">Так как не было ни одной перестановки, значит массив уже отсортирован!</string>
+    <string name="bubble_sort_swapping_numbers">Меняем местами %1$d и %2$d потому что число %3$d больше числа %4$d</string>
+    <string name="bubble_sort_numbers_are_ordered">Числа %1$d и %2$d следуют в правильном порядке</string>
+    <string name="bubble_sort_numbers_was_replaced">Числа %1$d и %2$d успешно поменялись местами</string>
+    <string name="bubble_sort_selecting_range_for_swapping">Выбираем диапазон для перестановок от %1$d до %2$d</string>
+    <string name="bubble_sort_last_element_popped_up_like_a_bubble">Последний элемент на выбранном диапазоне от %1$d до %2$d всплыл как пузырёк</string>
 </resources>

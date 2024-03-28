@@ -94,7 +94,7 @@ class SelectionSortAlgorithm : SortingAlgorithm {
             }
         }
 
-        steps.add(SortingAlgorithmStep.End(resources.getString(R.string.array_was_sorted_0)))
+        steps.add(SortingAlgorithmStep.End(resources.getString(R.string.array_was_sorted)))
 
         return steps
     }

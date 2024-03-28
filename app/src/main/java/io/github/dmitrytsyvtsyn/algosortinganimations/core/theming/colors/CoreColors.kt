@@ -9,6 +9,7 @@ object CoreColors {
     const val grayBold = 0xff222222.toInt()
 
     const val grayTranslucent = 0x9a333333.toInt()
+    const val blueMedium = 0xff0b74de.toInt()
 
     const val white = 0xffffffff.toInt()
     const val black = 0xff000000.toInt()

@@ -10,6 +10,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator.BaseParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.CoreTheme
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.ThemeManager
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.ColorAttributes
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.colors.CoreColors
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreButton
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreImageButtonView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreLinearLayout
@@ -147,7 +148,7 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
         controlButtonsView.addView(randomArrayButton)
 
         sortingAlgorithmView.changeStepListener { index, step ->
-            val title = step.titleResource
+            val title = step.title
             if (title.isNotBlank()) {
                 stepStatusView.text = context.getString(R.string.number_step, index + 1, title)
             }
@@ -244,10 +245,10 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
         super.onThemeChanged(insets, theme)
 
         sortingAlgorithmView.changeParams(
-            strokeColor = theme.colors[ColorAttributes.primaryColor],
-            selectedStrokeColor = theme.colors[ColorAttributes.primaryDarkColor],
+            itemColor = theme.colors[ColorAttributes.primaryColor],
             textColor = theme.colors[ColorAttributes.primaryTextColor],
             selectedTextColor = theme.colors[ColorAttributes.colorOnPrimary],
+            selectedRangeColor = CoreColors.blueMedium,
             typeface = TypefaceManager.typeface(TypefacePath.MEDIUM)
         )
 
