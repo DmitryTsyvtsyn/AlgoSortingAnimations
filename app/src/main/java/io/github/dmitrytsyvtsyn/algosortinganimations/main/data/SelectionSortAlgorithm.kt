@@ -27,50 +27,66 @@ class SelectionSortAlgorithm : SortingAlgorithm {
         val arraySize = array.size
         for (i in 0 until arraySize - 1) {
             steps.add(
-                SortingAlgorithmStep.Select(
-                    indices = intArrayOf(i),
-                    titleResource = "Выбираем минимальное значение для позиции $i"
+                SortingAlgorithmStep.SelectRange(
+                    startIndex = i,
+                    endIndex = i,
+                    title = resources.getString(R.string.selection_sort_selecting_minimum_value, i, array[i])
                 )
             )
             var min = i
             for (j in i + 1 until arraySize) {
                 steps.add(
                     SortingAlgorithmStep.Select(
-                        indices = intArrayOf(j),
-                        titleResource = "Сравниваем текущее минимальное значение ${array[min]} со значением ${array[j]}"
+                        indices = intArrayOf(min, j),
+                        title = resources.getString(R.string.selection_sort_comparing_minimum_value, array[min], array[j])
                     )
                 )
+
                 if (array[min] > array[j]) {
-                    min = j
                     steps.add(
                         SortingAlgorithmStep.Unselect(
-                            indices = intArrayOf(j),
-                            titleResource = "Значение ${array[j]} меньше текущего минимума, поэтому оно теперь минимальное"
+                            indices = intArrayOf(min),
+                            title = resources.getString(R.string.selection_sort_minimum_value_more_than_new_value, array[j])
                         )
                     )
+                    min = j
                 } else {
                     steps.add(
                         SortingAlgorithmStep.Unselect(
                             indices = intArrayOf(j),
-                            titleResource = "Значение ${array[j]} больше текущего минимума, поэтому ничего не делаем"
+                            title = resources.getString(R.string.selection_sort_minimum_value_less_than_new_value, array[j])
                         )
                     )
                 }
             }
 
             if (min != i) {
-
                 steps.add(
                     SortingAlgorithmStep.Select(
-                        indices = intArrayOf(min),
-                        titleResource = "Нашли новое минимальное значение ${array[min]} для позиции $i, поэтому меняем местами"
+                        indices = intArrayOf(i),
+                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_found, array[min], i)
                     )
                 )
+
                 steps.add(
-                    SortingAlgorithmStep.Swap(
-                        index1 = i,
-                        index2 = min,
-                        titleResource = "Нашли новое минимальное значение ${array[min]} для позиции $i, поэтому меняем местами"
+                    SortingAlgorithmStep.List(
+                        steps = arrayOf(
+                            SortingAlgorithmStep.UnselectRange(
+                                startIndex = i,
+                                endIndex = i,
+                                force = true
+                            ),
+                            SortingAlgorithmStep.SelectRange(
+                                startIndex = min,
+                                endIndex = min,
+                                force = true
+                            ),
+                            SortingAlgorithmStep.Swap(
+                                index1 = i,
+                                index2 = min
+                            )
+                        ),
+                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_found, array[min], i)
                     )
                 )
 
@@ -81,14 +97,28 @@ class SelectionSortAlgorithm : SortingAlgorithm {
                 steps.add(
                     SortingAlgorithmStep.Unselect(
                         indices = intArrayOf(i, min),
-                        titleResource = "Значение ${array[min]} на позиции $i является минимальным"
+                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_applied, array[i], i)
+                    )
+                )
+                steps.add(
+                    SortingAlgorithmStep.UnselectRange(
+                        startIndex = i,
+                        endIndex = i,
+                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_applied, array[i], i)
                     )
                 )
             } else {
                 steps.add(
                     SortingAlgorithmStep.Unselect(
                         indices = intArrayOf(i),
-                        titleResource = "Значение ${array[i]} на позиции $i является минимальным"
+                        title = resources.getString(R.string.selection_sort_minimum_value_has_already_set, array[i], i)
+                    )
+                )
+                steps.add(
+                    SortingAlgorithmStep.UnselectRange(
+                        startIndex = i,
+                        endIndex = i,
+                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_applied, array[i], i)
                     )
                 )
             }

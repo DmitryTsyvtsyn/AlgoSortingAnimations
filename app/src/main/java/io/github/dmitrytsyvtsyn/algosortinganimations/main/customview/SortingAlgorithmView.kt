@@ -74,6 +74,8 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private val emptyStepFinishAction = { false }
     private var stepFinishAction: () -> Boolean = emptyStepFinishAction
 
+    private val stepQueue = mutableListOf<SortingAlgorithmStep>()
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val statesSize = sortingItemsStates.size
 
@@ -356,14 +358,32 @@ class SortingAlgorithmView(context: Context) : View(context) {
         val step = steps.fetchCurrentOrEmptyStep(stepIndex)
         stepListener.invoke(stepIndex, step)
 
-        val status = when (step) {
-            is SortingAlgorithmStep.Swap -> handleStep(step, animate)
-            is SortingAlgorithmStep.Select -> handleStep(step, animate)
-            is SortingAlgorithmStep.Unselect -> handleStep(step, animate)
-            is SortingAlgorithmStep.SelectRange -> handleStep(step, animate)
-            is SortingAlgorithmStep.UnselectRange -> handleStep(step, animate)
-            is SortingAlgorithmStep.End -> handleStep(step, animate)
-            is SortingAlgorithmStep.Empty -> handleStep(step, animate)
+        var status = HandleStepStatus.NOT_INVALIDATE
+
+        stepQueue.clear()
+        stepQueue.add(step)
+        while (stepQueue.size > 0) {
+            val queuedStep = stepQueue.removeFirst()
+            if (queuedStep is SortingAlgorithmStep.List) {
+                stepQueue.addAll(queuedStep.steps)
+                continue
+            }
+
+            val realAnimate = animate && !queuedStep.force
+            val stepStatus = when (queuedStep) {
+                is SortingAlgorithmStep.Swap -> handleStep(queuedStep, realAnimate)
+                is SortingAlgorithmStep.Select -> handleStep(queuedStep, realAnimate)
+                is SortingAlgorithmStep.Unselect -> handleStep(queuedStep, realAnimate)
+                is SortingAlgorithmStep.SelectRange -> handleStep(queuedStep, realAnimate)
+                is SortingAlgorithmStep.UnselectRange -> handleStep(queuedStep, realAnimate)
+                is SortingAlgorithmStep.End -> handleStep(queuedStep, realAnimate)
+                is SortingAlgorithmStep.Empty -> handleStep(queuedStep, realAnimate)
+                else -> throw IllegalStateException("Unhandled step: $queuedStep")
+            }
+
+            if (stepStatus.priority > status.priority) {
+                status = stepStatus
+            }
         }
 
         when (status) {
@@ -688,11 +708,11 @@ class SortingAlgorithmView(context: Context) : View(context) {
         ANIMATION_PAUSED
     }
 
-    private enum class HandleStepStatus {
-        ANIMATION_INVALIDATE,
-        JUST_INVALIDATE,
-        NOT_INVALIDATE,
-        ERROR_INVALIDATE
+    private enum class HandleStepStatus(val priority: Int) {
+        ANIMATION_INVALIDATE(9),
+        JUST_INVALIDATE(8),
+        NOT_INVALIDATE(7),
+        ERROR_INVALIDATE(10)
     }
 
 }

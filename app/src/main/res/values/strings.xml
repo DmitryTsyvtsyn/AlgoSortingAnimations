@@ -26,4 +26,13 @@
     <string name="bubble_sort_numbers_was_replaced">Числа %1$d и %2$d успешно поменялись местами</string>
     <string name="bubble_sort_selecting_range_for_swapping">Выбираем диапазон для перестановок от %1$d до %2$d</string>
     <string name="bubble_sort_last_element_popped_up_like_a_bubble">Последний элемент на выбранном диапазоне от %1$d до %2$d всплыл как пузырёк</string>
+
+    <!-- Selection sort -->
+    <string name="selection_sort_selecting_minimum_value">Выбираем минимальное значение для позиции %1$d, текущий минимум: %2$d</string>
+    <string name="selection_sort_comparing_minimum_value">Сравниваем текущий минимум %1$d со значением %2$d</string>
+    <string name="selection_sort_minimum_value_more_than_new_value">Текущий минимум больше значения %1$d, поэтому это значение теперь минимальное</string>
+    <string name="selection_sort_minimum_value_less_than_new_value">Текущий минимум меньше значения %1$d, поэтому ничего не меняем</string>
+    <string name="selection_sort_new_minimum_value_has_found">Нашли новый минимум %1$d для позиции %2$d, поэтому меняем значения местами</string>
+    <string name="selection_sort_new_minimum_value_has_applied">Теперь значение %1$d является минимальным для позиции %2$d</string>
+    <string name="selection_sort_minimum_value_has_already_set">Значение %1$d для позиции %2$d уже является минимальным</string>
 </resources>

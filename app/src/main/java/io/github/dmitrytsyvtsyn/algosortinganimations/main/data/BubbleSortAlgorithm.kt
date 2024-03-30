@@ -30,14 +30,14 @@ class BubbleSortAlgorithm : SortingAlgorithm {
                 SortingAlgorithmStep.SelectRange(
                     startIndex = 0,
                     endIndex = arraySize - 1 - i,
-                    titleResource = resources.getString(R.string.bubble_sort_selecting_range_for_swapping, 0, arraySize - 1 - i)
+                    title = resources.getString(R.string.bubble_sort_selecting_range_for_swapping, 0, arraySize - 1 - i)
                 )
             )
             for (j in 0 until arraySize - 1 - i) {
                 steps.add(
                     SortingAlgorithmStep.Select(
                         indices = intArrayOf(j, j + 1),
-                        titleResource = resources.getString(
+                        title = resources.getString(
                             R.string.bubble_sort_comparing_number,
                             array[j],
                             array[j + 1]
@@ -49,7 +49,7 @@ class BubbleSortAlgorithm : SortingAlgorithm {
                         SortingAlgorithmStep.Swap(
                             index1 = j,
                             index2 = j + 1,
-                            titleResource = resources.getString(
+                            title = resources.getString(
                                 R.string.bubble_sort_swapping_numbers,
                                 array[j],
                                 array[j + 1],
@@ -65,7 +65,7 @@ class BubbleSortAlgorithm : SortingAlgorithm {
                     steps.add(
                         SortingAlgorithmStep.Unselect(
                             indices = intArrayOf(j, j + 1),
-                            titleResource = resources.getString(
+                            title = resources.getString(
                                 R.string.bubble_sort_numbers_was_replaced,
                                 array[j + 1],
                                 array[j]
@@ -76,7 +76,7 @@ class BubbleSortAlgorithm : SortingAlgorithm {
                     steps.add(
                         SortingAlgorithmStep.Unselect(
                             indices = intArrayOf(j, j + 1),
-                            titleResource = resources.getString(
+                            title = resources.getString(
                                 R.string.bubble_sort_numbers_are_ordered,
                                 array[j],
                                 array[j + 1]
