@@ -111,7 +111,7 @@ class SortingNewArrayDialog(params: BaseParams) : FrameLayout(params.context) {
             .marginTop(context.dp(24))
             .marginStart(marginMedium)
             .marginEnd(marginMedium))
-        arraySizesTitleView.setText(R.string.array_size)
+        arraySizesTitleView.setText(R.string.size)
         contentView.addView(arraySizesTitleView)
 
         val arraySizesContentView = RadioGroup(context)

@@ -1,9 +1,6 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main.customview
 
-sealed class SortingAlgorithmStep(
-    val title: String,
-    val force: Boolean
-) {
+sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
 
     class Swap(
         val index1: Int,
@@ -13,7 +10,7 @@ sealed class SortingAlgorithmStep(
     ): SortingAlgorithmStep(title, force) {
 
         override fun toString(): String =
-            "Swap(index1=$index1, index2=$index2, titleResource=$title)"
+            "Swap(index1=$index1, index2=$index2, title=$title, force=$force)"
     }
 
     class Select(
@@ -23,7 +20,7 @@ sealed class SortingAlgorithmStep(
     ): SortingAlgorithmStep(title, force) {
 
         override fun toString(): String =
-            "Select(indices=${indices.toList()}, titleResource=$title)"
+            "Select(indices=${indices.toList()}, title=$title, force=$force)"
     }
 
     class Unselect(
@@ -33,7 +30,7 @@ sealed class SortingAlgorithmStep(
      ): SortingAlgorithmStep(title, force) {
 
         override fun toString(): String =
-            "Unselect(indices=${indices.toList()}, titleResource=$title)"
+            "Unselect(indices=${indices.toList()}, title=$title, force=$force)"
     }
 
     class SelectRange(
@@ -44,7 +41,7 @@ sealed class SortingAlgorithmStep(
     ): SortingAlgorithmStep(title, force) {
 
         override fun toString(): String =
-            "SelectRange(startIndex=$startIndex, endIndex=$endIndex, titleResource=$title)"
+            "SelectRange(startIndex=$startIndex, endIndex=$endIndex, title=$title, force=$force)"
     }
 
     class UnselectRange(
@@ -55,7 +52,7 @@ sealed class SortingAlgorithmStep(
     ): SortingAlgorithmStep(title, force) {
 
         override fun toString(): String =
-            "UnselectRange(startIndex=$startIndex, endIndex=$endIndex, titleResource=$title)"
+            "UnselectRange(startIndex=$startIndex, endIndex=$endIndex, title=$title, force=$force)"
     }
 
     class End(
@@ -64,7 +61,7 @@ sealed class SortingAlgorithmStep(
     ) : SortingAlgorithmStep(title, force) {
 
         override fun toString(): String =
-            "End(titleResource=$title)"
+            "End(title=$title, force=$force)"
     }
 
     class List(
@@ -72,7 +69,40 @@ sealed class SortingAlgorithmStep(
         title: String = ""
     ) : SortingAlgorithmStep(title, force = false) {
 
-        override fun toString() = steps.joinToString(separator = ", ", prefix = "[ ", postfix = " ]")
+        override fun toString() =
+            "List(steps=${steps.joinToString(separator = ", ", prefix = "[ ", postfix = " ]")}, title=$title)"
+    }
+
+    class Move(
+        val currentIndex: Int,
+        val newIndex: Int,
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "Move(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
+    }
+
+    class Shift(
+        val currentIndex: Int,
+        val newIndex: Int,
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "Shift(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
+    }
+
+    class Up(
+        val indices: IntArray,
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "Up(indices=${indices.toList()}, title=$title, force=$force)"
     }
 
     object Empty : SortingAlgorithmStep("", force = false)  {

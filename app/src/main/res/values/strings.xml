@@ -2,9 +2,6 @@
     <string name="app_name">AlgoSorts</string>
     <string name="start">Start</string>
     <string name="pause">Pause</string>
-    <string name="bubble_sort">Bubble sort</string>
-    <string name="bubble_sort_improved">Bubble sort improved</string>
-    <string name="selection_sort">Selection sort</string>
     <string name="new_array">New array</string>
     <string name="worst_case_time">Worst-case time:</string>
     <string name="best_case_time">Best-case time:</string>
@@ -15,10 +12,12 @@
     <string name="random">Random</string>
     <string name="sorted">Sorted</string>
     <string name="ok">OK</string>
-    <string name="array_size">Array size:</string>
+    <string name="size">Size:</string>
     <string name="sorting_algorithms">Sorting algorithms</string>
 
     <!-- Bubble sort -->
+    <string name="bubble_sort">Bubble sort</string>
+    <string name="bubble_sort_improved">Bubble sort improved</string>
     <string name="bubble_sort_comparing_number">Сравниваем число %1$d с числом %2$d</string>
     <string name="bubble_sort_array_was_sorted">Так как не было ни одной перестановки, значит массив уже отсортирован!</string>
     <string name="bubble_sort_swapping_numbers">Меняем местами %1$d и %2$d потому что число %3$d больше числа %4$d</string>
@@ -28,6 +27,7 @@
     <string name="bubble_sort_last_element_popped_up_like_a_bubble">Последний элемент на выбранном диапазоне от %1$d до %2$d всплыл как пузырёк</string>
 
     <!-- Selection sort -->
+    <string name="selection_sort">Selection sort</string>
     <string name="selection_sort_selecting_minimum_value">Выбираем минимальное значение для позиции %1$d, текущий минимум: %2$d</string>
     <string name="selection_sort_comparing_minimum_value">Сравниваем текущий минимум %1$d со значением %2$d</string>
     <string name="selection_sort_minimum_value_more_than_new_value">Текущий минимум больше значения %1$d, поэтому это значение теперь минимальное</string>
@@ -35,4 +35,7 @@
     <string name="selection_sort_new_minimum_value_has_found">Нашли новый минимум %1$d для позиции %2$d, поэтому меняем значения местами</string>
     <string name="selection_sort_new_minimum_value_has_applied">Теперь значение %1$d является минимальным для позиции %2$d</string>
     <string name="selection_sort_minimum_value_has_already_set">Значение %1$d для позиции %2$d уже является минимальным</string>
+
+    <!-- Insertion sort -->
+    <string name="insertion_sort">Insertion sort</string>
 </resources>
