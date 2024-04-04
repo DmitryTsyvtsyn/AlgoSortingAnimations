@@ -14,18 +14,22 @@ class SortingItemState {
         AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0))
     )
 
+    private val animationDurations = LongArray(animatedProperties.size) { 0L }
+
     val title: String
         get() = text
 
     val isAnimationRunning: Boolean
         get() = animatedProperties.any { it.size > 1 }
 
-    fun finishAnimation(): Boolean {
-        if (isAnimationRunning) {
-            animatedProperties.forEach { animatedArray -> animatedArray.pop(1f) }
-            return true
-        }
-        return false
+    fun changeTitle(title: String): SortingItemState {
+        text = title
+        return this
+    }
+
+    fun <T> changeDuration(key: AnimationKey<T>, duration: Long): SortingItemState {
+        animationDurations[key.key] = duration
+        return this
     }
 
     fun <T> forceValue(key: AnimationKey<T>, value: T): SortingItemState {
@@ -49,13 +53,23 @@ class SortingItemState {
         return (animatedProperties[key.key] as AnimatedArray<T>).peek()
     }
 
-    fun <T> animatedValue(key: AnimationKey<T>, fraction: Float): T {
+    fun <T> animatedValue(key: AnimationKey<T>, animationTime: Long): T {
+        var fraction = 1f
+
+        val duration = animationDurations[key.key]
+        if (duration > 0) {
+            fraction = (animationTime / duration.toFloat()).coerceAtMost(1f)
+        }
+
         return (animatedProperties[key.key] as AnimatedArray<T>).pop(fraction)
     }
 
-    fun changeTitle(title: String): SortingItemState {
-        text = title
-        return this
+    fun finishAnimation(): Boolean {
+        if (isAnimationRunning) {
+            animatedProperties.forEach { animatedArray -> animatedArray.pop(1f) }
+            return true
+        }
+        return false
     }
 
     sealed class AnimationKey<T>(val key: Int) {

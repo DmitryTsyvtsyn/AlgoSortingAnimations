@@ -24,7 +24,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                 SortingAlgorithmStep.SelectRange(
                     startIndex = 0,
                     endIndex = i,
-                    title = "Выбираем подмассив для вставки"
+                    title = resources.getString(R.string.insertion_sort_selecting_sub_array)
                 )
             )
 
@@ -37,14 +37,14 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                         SortingAlgorithmStep.Select(indices = intArrayOf(i)),
                         SortingAlgorithmStep.Up(indices = intArrayOf(i))
                     ),
-                    title = "Ищем новую позицию для элемента $current в подмассиве"
+                    title = resources.getString(R.string.insertion_sort_finding_new_position_for_number, current)
                 )
             )
 
             steps.add(
                 SortingAlgorithmStep.Select(
                     indices = intArrayOf(j),
-                    title = "Сравниваем $current со значением ${array[j]}"
+                    title = resources.getString(R.string.insertion_sort_comparing_numbers, current, array[j])
                 )
             )
 
@@ -56,7 +56,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                     steps.add(
                         SortingAlgorithmStep.Unselect(
                             indices = intArrayOf(j),
-                            title = "Ничего не делаем, так как $current больше значения ${array[j]}"
+                            title = resources.getString(R.string.insertion_sort_nothing_to_do_numbers_was_already_ordered, current, array[j])
                         )
                     )
 
@@ -74,7 +74,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                                 indices = intArrayOf(j + 1)
                             )
                         ),
-                        title = "Сдвигаем значение ${array[j]} так как оно больше $current"
+                        title = resources.getString(R.string.insertion_sort_shifting_number, array[j], current)
                     )
                 )
 
@@ -94,11 +94,10 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                                 newIndex = j + 1,
                             ),
                             SortingAlgorithmStep.Unselect(
-                                indices = intArrayOf(j + 1),
-                                title = "Нашли новую позицию для $current в подмассиве"
+                                indices = intArrayOf(j + 1)
                             )
                         ),
-                        title = "Нашли новую позицию для $current в подмассиве"
+                        title = resources.getString(R.string.insertion_sort_new_position_was_found, current)
                     )
                 )
             } else {
@@ -113,7 +112,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                                 indices = intArrayOf(i)
                             )
                         ),
-                        title = "Позиция для $current не поменялась в подмассиве"
+                        title = resources.getString(R.string.insertion_sort_position_was_not_changed, current)
                     )
                 )
             }
@@ -122,7 +121,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                 SortingAlgorithmStep.UnselectRange(
                     startIndex = 0,
                     endIndex = i,
-                    title = "Подмассив отсортирован!"
+                    title = resources.getString(R.string.insertion_sort_sub_array_was_sorted)
                 )
             )
         }

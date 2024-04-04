@@ -38,7 +38,7 @@ class BubbleSortAlgorithm : SortingAlgorithm {
                     SortingAlgorithmStep.Select(
                         indices = intArrayOf(j, j + 1),
                         title = resources.getString(
-                            R.string.bubble_sort_comparing_number,
+                            R.string.bubble_sort_comparing_numbers,
                             array[j],
                             array[j + 1]
                         )

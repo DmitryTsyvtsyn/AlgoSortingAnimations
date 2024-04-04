@@ -18,7 +18,7 @@
     <!-- Bubble sort -->
     <string name="bubble_sort">Bubble sort</string>
     <string name="bubble_sort_improved">Bubble sort improved</string>
-    <string name="bubble_sort_comparing_number">Сравниваем число %1$d с числом %2$d</string>
+    <string name="bubble_sort_comparing_numbers">Сравниваем число %1$d с числом %2$d</string>
     <string name="bubble_sort_array_was_sorted">Так как не было ни одной перестановки, значит массив уже отсортирован!</string>
     <string name="bubble_sort_swapping_numbers">Меняем местами %1$d и %2$d потому что число %3$d больше числа %4$d</string>
     <string name="bubble_sort_numbers_are_ordered">Числа %1$d и %2$d следуют в правильном порядке</string>
@@ -38,4 +38,12 @@
 
     <!-- Insertion sort -->
     <string name="insertion_sort">Insertion sort</string>
+    <string name="insertion_sort_selecting_sub_array">Выбираем подмассив для вставки</string>
+    <string name="insertion_sort_sub_array_was_sorted">Подмассив отсортирован!</string>
+    <string name="insertion_sort_finding_new_position_for_number">Ищем новую позицию для числа %1$d в подмассиве</string>
+    <string name="insertion_sort_comparing_numbers">Сравниваем %1$d с числом %2$d</string>
+    <string name="insertion_sort_nothing_to_do_numbers_was_already_ordered">Ничего не делаем, так как %1$d больше числа %2$d</string>
+    <string name="insertion_sort_shifting_number">Сдвигаем число %1$d так как оно больше %2$d</string>
+    <string name="insertion_sort_new_position_was_found">Нашли новую позицию для числа %1$d в подмассиве</string>
+    <string name="insertion_sort_position_was_not_changed">Позиция для числа %1$d не поменялась в подмассиве</string>
 </resources>
