@@ -1,14 +1,12 @@
 <resources>
     <string name="app_name">AlgoSorts</string>
-    <string name="start">Start</string>
-    <string name="pause">Pause</string>
     <string name="new_array">New array</string>
     <string name="worst_case_time">Worst-case time:</string>
     <string name="best_case_time">Best-case time:</string>
     <string name="average_time">Average time:</string>
     <string name="worst_case_space">Worst-case space:</string>
-    <string name="number_step">%1$d-й шаг: %2$s</string>
-    <string name="array_was_sorted">Массив отсортирован!</string>
+    <string name="number_step">%1$d step: %2$s</string>
+    <string name="array_was_sorted">The array is sorted!</string>
     <string name="random">Random</string>
     <string name="sorted">Sorted</string>
     <string name="ok">OK</string>
@@ -18,32 +16,32 @@
     <!-- Bubble sort -->
     <string name="bubble_sort">Bubble sort</string>
     <string name="bubble_sort_improved">Bubble sort improved</string>
-    <string name="bubble_sort_comparing_numbers">Сравниваем число %1$d с числом %2$d</string>
-    <string name="bubble_sort_array_was_sorted">Так как не было ни одной перестановки, значит массив уже отсортирован!</string>
-    <string name="bubble_sort_swapping_numbers">Меняем местами %1$d и %2$d потому что число %3$d больше числа %4$d</string>
-    <string name="bubble_sort_numbers_are_ordered">Числа %1$d и %2$d следуют в правильном порядке</string>
-    <string name="bubble_sort_numbers_was_replaced">Числа %1$d и %2$d успешно поменялись местами</string>
-    <string name="bubble_sort_selecting_range_for_swapping">Выбираем диапазон для перестановок от %1$d до %2$d</string>
-    <string name="bubble_sort_last_element_popped_up_like_a_bubble">Последний элемент на выбранном диапазоне от %1$d до %2$d всплыл как пузырёк</string>
+    <string name="bubble_sort_comparing_numbers">Compare the number %1$d with the number %2$d</string>
+    <string name="bubble_sort_array_was_sorted">Since there were no permutations, the array is sorted!</string>
+    <string name="bubble_sort_swapping_numbers">Swap %1$d and %2$d because the number %3$d is greater than the number %4$d</string>
+    <string name="bubble_sort_numbers_are_ordered">The numbers %1$d and %2$d are in the correct order</string>
+    <string name="bubble_sort_numbers_was_replaced">The numbers %1$d and %2$d have successfully swapped</string>
+    <string name="bubble_sort_selecting_range_for_swapping">Select the range for permutations from %1$d to %2$d</string>
+    <string name="bubble_sort_last_element_popped_up_like_a_bubble">The last number in this range pops up like a bubble</string>
 
     <!-- Selection sort -->
     <string name="selection_sort">Selection sort</string>
-    <string name="selection_sort_selecting_minimum_value">Выбираем минимальное значение для позиции %1$d, текущий минимум: %2$d</string>
-    <string name="selection_sort_comparing_minimum_value">Сравниваем текущий минимум %1$d со значением %2$d</string>
-    <string name="selection_sort_minimum_value_more_than_new_value">Текущий минимум больше значения %1$d, поэтому это значение теперь минимальное</string>
-    <string name="selection_sort_minimum_value_less_than_new_value">Текущий минимум меньше значения %1$d, поэтому ничего не меняем</string>
-    <string name="selection_sort_new_minimum_value_has_found">Нашли новый минимум %1$d для позиции %2$d, поэтому меняем значения местами</string>
-    <string name="selection_sort_new_minimum_value_has_applied">Теперь значение %1$d является минимальным для позиции %2$d</string>
-    <string name="selection_sort_minimum_value_has_already_set">Значение %1$d для позиции %2$d уже является минимальным</string>
+    <string name="selection_sort_selecting_minimum_number">Select the minimum number for the position %1$d, current minimum: %2$d</string>
+    <string name="selection_sort_comparing_minimum_number">Compare the current minimum %1$d with the number %2$d</string>
+    <string name="selection_sort_minimum_more_than_new_number">The current minimum is greater than the number %1$d so now this number is minimum</string>
+    <string name="selection_sort_minimum_less_than_new_number">The current minimum is less than the number %1$d so we don\'t change anything</string>
+    <string name="selection_sort_new_minimum_has_found">Found a new minimum %1$d for the position %2$d so let\'s swap the numbers</string>
+    <string name="selection_sort_new_minimum_has_applied">Now the number %1$d is the minimum for this position</string>
+    <string name="selection_sort_minimum_has_already_set">The number %1$d is already the minimum for this position</string>
 
     <!-- Insertion sort -->
     <string name="insertion_sort">Insertion sort</string>
-    <string name="insertion_sort_selecting_sub_array">Выбираем подмассив для вставки</string>
-    <string name="insertion_sort_sub_array_was_sorted">Подмассив отсортирован!</string>
-    <string name="insertion_sort_finding_new_position_for_number">Ищем новую позицию для числа %1$d в подмассиве</string>
-    <string name="insertion_sort_comparing_numbers">Сравниваем %1$d с числом %2$d</string>
-    <string name="insertion_sort_nothing_to_do_numbers_was_already_ordered">Ничего не делаем, так как %1$d больше числа %2$d</string>
-    <string name="insertion_sort_shifting_number">Сдвигаем число %1$d так как оно больше %2$d</string>
-    <string name="insertion_sort_new_position_was_found">Нашли новую позицию для числа %1$d в подмассиве</string>
-    <string name="insertion_sort_position_was_not_changed">Позиция для числа %1$d не поменялась в подмассиве</string>
+    <string name="insertion_sort_selecting_sub_array">Select the subarray to insert</string>
+    <string name="insertion_sort_sub_array_was_sorted">The subarray is sorted!</string>
+    <string name="insertion_sort_looking_for_new_position_for_number">Looking for a new position for the number %1$d in the subarray</string>
+    <string name="insertion_sort_comparing_numbers">Compare %1$d with the number %2$d</string>
+    <string name="insertion_sort_nothing_to_do_numbers_was_already_ordered">We don\'t do anything because %1$d is greater than the number %2$d</string>
+    <string name="insertion_sort_shifting_number">Shift the number %1$d because it\'s greater than %2$d</string>
+    <string name="insertion_sort_new_position_was_found">Found a new position for the number %1$d in the subarray</string>
+    <string name="insertion_sort_position_was_not_changed">The position for the number %1$d has not changed in the subarray</string>
 </resources>

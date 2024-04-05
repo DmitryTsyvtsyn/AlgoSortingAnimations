@@ -1,10 +1,13 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.new_array
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Configuration
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RadioGroup
+import androidx.annotation.StringRes
 import androidx.core.view.forEach
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator.BaseParams
@@ -122,48 +125,47 @@ class SortingNewArrayDialog(params: BaseParams) : FrameLayout(params.context) {
             .marginEnd(marginMedium))
         contentView.addView(arraySizesContentView)
 
-        val generateRandomArrayButton = CoreButton(
-            ctx = context,
-            shapeTreatmentStrategy = ShapeTreatmentStrategy.AllRounded()
-        )
-        generateRandomArrayButton.setText(R.string.random)
-        generateRandomArrayButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
-            .marginTop(context.dp(24))
-            .marginStart(marginMedium)
-            .marginEnd(marginMedium))
-        generateRandomArrayButton.setOnClickListener {
-            viewModel.generateRandomArray()
-        }
-        contentView.addView(generateRandomArrayButton)
+        val landscape = context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-        val generateSortedArrayButton = CoreButton(
+        val buttonsContentView = CoreLinearLayout(
             ctx = context,
-            shapeTreatmentStrategy = ShapeTreatmentStrategy.AllRounded()
+            backgroundColor = ColorAttributes.transparent
         )
-        generateSortedArrayButton.setText(R.string.sorted)
-        generateSortedArrayButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
-            .marginTop(context.dp(12))
-            .marginStart(marginMedium)
-            .marginEnd(marginMedium))
-        generateSortedArrayButton.setOnClickListener {
-            viewModel.generateSortedArray()
+        buttonsContentView.padding(start = marginMedium, end = marginMedium)
+        buttonsContentView.layoutParams(linearLayoutParams().matchWidth().wrapHeight().marginTop(context.dp(24)))
+        buttonsContentView.orientation = when (landscape) {
+            true -> LinearLayout.HORIZONTAL
+            false -> LinearLayout.VERTICAL
         }
-        contentView.addView(generateSortedArrayButton)
+        contentView.addView(buttonsContentView)
 
-        val okButton = CoreButton(
-            ctx = context,
-            shapeTreatmentStrategy = ShapeTreatmentStrategy.AllRounded()
+        val buttonMargin = context.dp(12)
+        val randomArrayButton = context.createButton(
+            textResource = R.string.random,
+            margin = 0,
+            landscape = landscape
         )
-        okButton.setText(R.string.ok)
+        randomArrayButton.setOnClickListener { viewModel.generateRandomArray() }
+        buttonsContentView.addView(randomArrayButton)
+
+        val sortedArrayButton = context.createButton(
+            textResource = R.string.sorted,
+            margin = buttonMargin,
+            landscape = landscape
+        )
+        sortedArrayButton.setOnClickListener { viewModel.generateSortedArray() }
+        buttonsContentView.addView(sortedArrayButton)
+
+        val okButton = context.createButton(
+            textResource = R.string.ok,
+            margin = buttonMargin,
+            landscape = landscape
+        )
         okButton.setOnClickListener {
             parentViewModel.changeSortingArray(viewModel.array)
             viewModel.navigateBack()
         }
-        okButton.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
-            .marginTop(context.dp(12))
-            .marginStart(marginMedium)
-            .marginEnd(marginMedium))
-        contentView.addView(okButton)
+        buttonsContentView.addView(okButton)
 
         var cachedState = SortingNewArrayState()
         coroutineScope.launch {
@@ -211,6 +213,30 @@ class SortingNewArrayDialog(params: BaseParams) : FrameLayout(params.context) {
             }
         }
 
+    }
+
+    private fun Context.createButton(
+        @StringRes textResource: Int,
+        margin: Int = 0,
+        landscape: Boolean = false
+    ): CoreButton {
+        val button = CoreButton(
+            ctx = this,
+            shapeTreatmentStrategy = ShapeTreatmentStrategy.AllRounded()
+        )
+        button.setText(textResource)
+
+        val layoutParams = if (landscape) {
+            linearLayoutParams().wrap().weight(1f).marginStart(margin)
+        } else {
+            linearLayoutParams().matchWidth().wrapHeight().marginTop(margin)
+        }
+
+        button.layoutParams(layoutParams)
+        button.setOnClickListener {
+            viewModel.generateSortedArray()
+        }
+        return button
     }
 
     override fun onDetachedFromWindow() {

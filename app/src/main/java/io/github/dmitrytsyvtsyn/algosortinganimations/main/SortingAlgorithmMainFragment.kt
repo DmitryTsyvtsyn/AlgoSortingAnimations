@@ -1,6 +1,7 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.main
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.text.TextUtils
 import android.view.View
 import android.view.View.OnClickListener
@@ -62,14 +63,19 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
         }
         addView(toolbarView)
 
+        val landscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
         val sortingContentView = object : CoreLinearLayout(context) {
             override fun onThemeChanged(insets: ThemeManager.WindowInsets, theme: CoreTheme) {
                 setBackgroundColor(theme.colors[ColorAttributes.secondaryBackgroundColor])
             }
         }
         sortingContentView.orientation = VERTICAL
-        sortingContentView.layoutParams(linearLayoutParams().matchWidth().wrapHeight()
-            .marginTop(context.dp(16)))
+        sortingContentView.layoutParams(if (landscape) {
+            linearLayoutParams().matchWidth().matchHeight()
+        } else {
+            linearLayoutParams().matchWidth().wrapHeight()
+        })
         addView(sortingContentView)
 
         sortingAlgorithmView.layoutParams(linearLayoutParams().matchWidth().wrapHeight())
@@ -79,12 +85,12 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
             ctx = context,
             textStyle = TypefaceAttribute.Caption1
         )
-        val lineNumber = 3
+        val lineNumber = if (landscape) 1 else 2
         stepStatusView.setLines(lineNumber)
         stepStatusView.minLines = lineNumber
         stepStatusView.maxLines = lineNumber
         stepStatusView.ellipsize = TextUtils.TruncateAt.END
-        stepStatusView.padding(context.dp(16))
+        stepStatusView.padding(horizontal = context.dp(16), vertical = context.dp(12))
         stepStatusView.layoutParams(linearLayoutParams().matchWidth().wrapHeight())
         sortingContentView.addView(stepStatusView)
 

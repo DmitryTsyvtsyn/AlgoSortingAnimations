@@ -24,7 +24,7 @@ class ToolbarView(ctx: Context) : CoreFrameLayout(ctx) {
     init {
         elevation = context.dp(2f)
 
-        titleView.maxLines = 2
+        titleView.maxLines = 1
         titleView.ellipsize = TextUtils.TruncateAt.END
         val titleMargins = context.dp(menuButtonSize + menuButtonMarginStart + 8)
         titleView.layoutParams(frameLayoutParams().wrap().gravity(Gravity.CENTER).marginStart(titleMargins).marginEnd(titleMargins))

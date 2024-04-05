@@ -30,7 +30,7 @@ class SelectionSortAlgorithm : SortingAlgorithm {
                 SortingAlgorithmStep.SelectRange(
                     startIndex = i,
                     endIndex = i,
-                    title = resources.getString(R.string.selection_sort_selecting_minimum_value, i, array[i])
+                    title = resources.getString(R.string.selection_sort_selecting_minimum_number, i, array[i])
                 )
             )
             var min = i
@@ -38,7 +38,7 @@ class SelectionSortAlgorithm : SortingAlgorithm {
                 steps.add(
                     SortingAlgorithmStep.Select(
                         indices = intArrayOf(min, j),
-                        title = resources.getString(R.string.selection_sort_comparing_minimum_value, array[min], array[j])
+                        title = resources.getString(R.string.selection_sort_comparing_minimum_number, array[min], array[j])
                     )
                 )
 
@@ -46,7 +46,7 @@ class SelectionSortAlgorithm : SortingAlgorithm {
                     steps.add(
                         SortingAlgorithmStep.Unselect(
                             indices = intArrayOf(min),
-                            title = resources.getString(R.string.selection_sort_minimum_value_more_than_new_value, array[j])
+                            title = resources.getString(R.string.selection_sort_minimum_more_than_new_number, array[j])
                         )
                     )
                     min = j
@@ -54,7 +54,7 @@ class SelectionSortAlgorithm : SortingAlgorithm {
                     steps.add(
                         SortingAlgorithmStep.Unselect(
                             indices = intArrayOf(j),
-                            title = resources.getString(R.string.selection_sort_minimum_value_less_than_new_value, array[j])
+                            title = resources.getString(R.string.selection_sort_minimum_less_than_new_number, array[j])
                         )
                     )
                 }
@@ -64,7 +64,7 @@ class SelectionSortAlgorithm : SortingAlgorithm {
                 steps.add(
                     SortingAlgorithmStep.Select(
                         indices = intArrayOf(i),
-                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_found, array[min], i)
+                        title = resources.getString(R.string.selection_sort_new_minimum_has_found, array[min], i)
                     )
                 )
 
@@ -86,7 +86,7 @@ class SelectionSortAlgorithm : SortingAlgorithm {
                                 index2 = min
                             )
                         ),
-                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_found, array[min], i)
+                        title = resources.getString(R.string.selection_sort_new_minimum_has_found, array[min], i)
                     )
                 )
 
@@ -97,28 +97,28 @@ class SelectionSortAlgorithm : SortingAlgorithm {
                 steps.add(
                     SortingAlgorithmStep.Unselect(
                         indices = intArrayOf(i, min),
-                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_applied, array[i], i)
+                        title = resources.getString(R.string.selection_sort_new_minimum_has_applied, array[i])
                     )
                 )
                 steps.add(
                     SortingAlgorithmStep.UnselectRange(
                         startIndex = i,
                         endIndex = i,
-                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_applied, array[i], i)
+                        title = resources.getString(R.string.selection_sort_new_minimum_has_applied, array[i])
                     )
                 )
             } else {
                 steps.add(
                     SortingAlgorithmStep.Unselect(
                         indices = intArrayOf(i),
-                        title = resources.getString(R.string.selection_sort_minimum_value_has_already_set, array[i], i)
+                        title = resources.getString(R.string.selection_sort_minimum_has_already_set, array[i])
                     )
                 )
                 steps.add(
                     SortingAlgorithmStep.UnselectRange(
                         startIndex = i,
                         endIndex = i,
-                        title = resources.getString(R.string.selection_sort_new_minimum_value_has_applied, array[i], i)
+                        title = resources.getString(R.string.selection_sort_new_minimum_has_applied, array[i])
                     )
                 )
             }

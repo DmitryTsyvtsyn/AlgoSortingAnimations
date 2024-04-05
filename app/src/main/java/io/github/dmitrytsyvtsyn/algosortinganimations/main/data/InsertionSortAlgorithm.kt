@@ -37,7 +37,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                         SortingAlgorithmStep.Select(indices = intArrayOf(i)),
                         SortingAlgorithmStep.Up(indices = intArrayOf(i))
                     ),
-                    title = resources.getString(R.string.insertion_sort_finding_new_position_for_number, current)
+                    title = resources.getString(R.string.insertion_sort_looking_for_new_position_for_number, current)
                 )
             )
 

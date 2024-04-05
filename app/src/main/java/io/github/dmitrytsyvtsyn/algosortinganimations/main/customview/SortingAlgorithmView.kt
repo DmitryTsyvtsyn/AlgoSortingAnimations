@@ -120,7 +120,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
             }
         }
 
-        startOfView = measuredWidth / 2 - itemSize * sortingItemsStates.size / 2
+        startOfView = measuredWidth / 2 - itemSize * sortingArrayCopy.size / 2
         topOfView = measuredHeight / 2 - itemSize / 2
 
         resetItems(); handleStep(animate = false)
@@ -601,7 +601,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
         val newStartPosition = startOfView + itemSize * newIndex + startPositionDifference
 
         var topPosition = state.value(SortingItemState.AnimationKey.TopPosition)
-        val topOffset = itemSize + itemMargin * 2
+        val topOffset = itemSize + itemMargin
         if ((topPosition + topOffset) >= measuredHeight) {
             topPosition = paddingTop.toFloat()
             moveItemsToTopPosition(topPosition)
@@ -699,7 +699,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
             pendingSortingItemStates.put(index, state)
 
-            val newTopPosition = state.value(SortingItemState.AnimationKey.TopPosition) - itemSize - 2 * itemMargin
+            val newTopPosition = state.value(SortingItemState.AnimationKey.TopPosition) - itemSize - itemMargin
             when {
                 animate -> {
                     state
