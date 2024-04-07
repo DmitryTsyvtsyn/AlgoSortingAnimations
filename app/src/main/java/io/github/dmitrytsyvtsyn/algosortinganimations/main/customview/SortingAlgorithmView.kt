@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.text.TextPaint
 import android.util.SparseArray
 import android.view.View
+import androidx.core.util.forEach
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.sign
@@ -75,8 +76,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
     private val restartAnimationDelayedRunnable = Runnable { stopAnimation(); startAnimation() }
 
-    private val emptyStepFinishAction = { false }
-    private var stepFinishAction: () -> Boolean = emptyStepFinishAction
+    private val stepFinishActions = mutableListOf<() -> Boolean>()
 
     private val stepQueue = mutableListOf<SortingAlgorithmStep>()
 
@@ -296,8 +296,9 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
         // finish the current step animations
         sortingItemsStates.forEach { state -> state.finishAnimation() }
+        pendingSortingItemStates.forEach { _, state -> state.finishAnimation() }
         pausedAnimationTime = 0L
-        invokeStepFinishAction()
+        invokeStepFinishActions()
 
         if (newStepIndex < stepIndex) {
             resetItems() // inverted handleStep() is not implemented
@@ -562,7 +563,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
                     .addValue(SortingItemState.AnimationKey.TopPosition, topPosition2)
                     .addLastValue(SortingItemState.AnimationKey.StartPosition)
 
-                stepFinishAction = {
+                stepFinishActions.add {
                     sortingItemsStates[index1] = state2
                     sortingItemsStates[index2] = state1
                     true
@@ -620,7 +621,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
                     .addValue(SortingItemState.AnimationKey.TopPosition, newTopPosition)
                     .addLastValue(SortingItemState.AnimationKey.StartPosition)
 
-                stepFinishAction = {
+                stepFinishActions.add {
                     sortingItemsStates[newIndex] = state
                     pendingSortingItemStates.remove(currentIndex)
 
@@ -664,7 +665,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
                     .changeDuration(SortingItemState.AnimationKey.StartPosition, startPositionDuration)
                     .addValue(SortingItemState.AnimationKey.StartPosition, newStartPosition)
 
-                stepFinishAction = {
+                stepFinishActions.add {
                     sortingItemsStates[newIndex] = state
 
                     true
@@ -735,15 +736,15 @@ class SortingAlgorithmView(context: Context) : View(context) {
         return get(index)
     }
 
-    private fun invokeStepFinishAction() {
-        stepFinishAction.invoke()
-        stepFinishAction = emptyStepFinishAction
+    private fun invokeStepFinishActions() {
+        stepFinishActions.forEach { it.invoke() }
+        stepFinishActions.clear()
     }
 
     private fun resetItems() {
         clearCallbacks()
 
-        stepFinishAction = emptyStepFinishAction
+        stepFinishActions.clear()
         pausedAnimationTime = 0
         stepIndex = -1
 
