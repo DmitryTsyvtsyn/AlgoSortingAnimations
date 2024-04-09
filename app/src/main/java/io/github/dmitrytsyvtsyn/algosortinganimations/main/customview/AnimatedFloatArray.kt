@@ -5,22 +5,22 @@ import kotlin.math.floor
 
 class AnimatedFloatArray(private val array: FloatArray): AnimatedArray<Float> {
 
-    private val tag = "AnimatedFloatArray"
-
     private var pushPointer = 0
 
     override val size: Int
         get() = pushPointer
 
-    override fun forcePush(value: Float) {
-        if (array.isEmpty()) error("The array is out of bounds, array size is 0")
+    init {
+        if (array.isEmpty()) throw IllegalStateException("The array constructor param is empty!")
+    }
 
+    override fun forcePush(value: Float) {
         array[0] = value
         pushPointer = 1
     }
 
     override fun push(value: Float) {
-        if (pushPointer >= array.size) error("The array is out of bounds, array -> $array, index -> $pushPointer")
+        if (pushPointer >= array.size) throw IllegalStateException("The array is out of bounds, array -> $array, index -> $pushPointer")
 
         array[pushPointer] = value
 
@@ -34,13 +34,13 @@ class AnimatedFloatArray(private val array: FloatArray): AnimatedArray<Float> {
     }
 
     override fun peek(): Float {
-        if (pushPointer == 0) error("The array is empty!")
+        if (pushPointer == 0) throw IllegalStateException("The array is empty!")
 
         return array[pushPointer - 1]
     }
 
     override fun pop(fraction: Float): Float {
-        if (pushPointer == 0) error("The array is empty!")
+        if (pushPointer == 0) throw IllegalStateException("The array is empty!")
 
         if (pushPointer == 1) {
             return array[0]

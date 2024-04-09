@@ -11,15 +11,17 @@ class AnimatedColorArray(private val array: IntArray): AnimatedArray<Int> {
     override val size: Int
         get() = pushPointer
 
-    override fun forcePush(value: Int) {
-        if (array.isEmpty()) error("The array is out of bounds, array size is 0")
+    init {
+        if (array.isEmpty()) throw IllegalStateException("The array constructor param is empty!")
+    }
 
+    override fun forcePush(value: Int) {
         array[0] = value
         pushPointer = 1
     }
 
     override fun push(value: Int) {
-        if (pushPointer >= array.size) error("The array is out of bounds, array -> $array, index -> $pushPointer")
+        if (pushPointer >= array.size) throw IllegalStateException("The array is out of bounds, array -> $array, index -> $pushPointer")
 
         array[pushPointer] = value
 
@@ -33,13 +35,13 @@ class AnimatedColorArray(private val array: IntArray): AnimatedArray<Int> {
     }
 
     override fun peek(): Int {
-        if (pushPointer == 0) error("The array is empty!")
+        if (pushPointer == 0) throw IllegalStateException("The array is empty!")
 
         return array[pushPointer - 1]
     }
 
     override fun pop(fraction: Float): Int {
-        if (pushPointer == 0) error("The array is empty!")
+        if (pushPointer == 0) throw IllegalStateException("The array is empty!")
 
         if (pushPointer == 1) {
             return array[0]
