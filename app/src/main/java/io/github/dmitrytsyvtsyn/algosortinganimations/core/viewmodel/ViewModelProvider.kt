@@ -10,6 +10,7 @@ class ViewModelProvider : CoreViewModel {
 
         val newProvider = factory.invoke()
         val newProviderCache = newProvider.cache
+        // child ViewModelProviders must have access to parent ViewModels
         cache.forEach { (key, value) ->
             if (value !is ViewModelProvider) {
                 newProviderCache[key] = value
