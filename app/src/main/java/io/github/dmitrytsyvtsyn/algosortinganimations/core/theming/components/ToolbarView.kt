@@ -11,6 +11,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.Type
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.frameLayoutParams
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.viewGroupLayoutParams
 
 class ToolbarView(ctx: Context) : CoreFrameLayout(ctx) {
 
@@ -53,6 +54,8 @@ class ToolbarView(ctx: Context) : CoreFrameLayout(ctx) {
         menuButtonView.isClickable = true
         menuButtonView.isFocusable = true
         addView(menuButtonView)
+
+        layoutParams(viewGroupLayoutParams().matchWidth().height(context.dp(56)))
     }
 
     fun changeTitle(title: String) {

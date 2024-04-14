@@ -19,7 +19,6 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.Co
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.CoreTextView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.components.ToolbarView
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.dp
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.frameLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.layoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params.linearLayoutParams
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.padding
@@ -56,7 +55,6 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
         orientation = VERTICAL
 
         val toolbarView = ToolbarView(context)
-        toolbarView.layoutParams(frameLayoutParams().matchWidth().height(context.dp(48)))
         toolbarView.changeMenuButtonDrawable(R.drawable.ic_settings)
         toolbarView.changeMenuClickListener {
             navigator.navigateForward(::SortingAlgorithmSelectionFragment)
