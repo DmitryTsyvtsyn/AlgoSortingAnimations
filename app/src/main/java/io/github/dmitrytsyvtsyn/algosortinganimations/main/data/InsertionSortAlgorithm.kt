@@ -89,7 +89,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                 steps.add(
                     SortingAlgorithmStep.List(
                         steps = arrayOf(
-                            SortingAlgorithmStep.Move(
+                            SortingAlgorithmStep.Insert(
                                 currentIndex = i,
                                 newIndex = j + 1,
                             ),
@@ -104,7 +104,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                 steps.add(
                     SortingAlgorithmStep.List(
                         steps = arrayOf(
-                            SortingAlgorithmStep.Move(
+                            SortingAlgorithmStep.Insert(
                                 currentIndex = i,
                                 newIndex = i,
                             ),

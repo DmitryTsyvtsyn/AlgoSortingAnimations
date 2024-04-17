@@ -73,7 +73,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
             "List(steps=${steps.joinToString(separator = ", ", prefix = "[ ", postfix = " ]")}, title=$title)"
     }
 
-    class Move(
+    class Insert(
         val currentIndex: Int,
         val newIndex: Int,
         title: String = "",
@@ -81,7 +81,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
     ) : SortingAlgorithmStep(title, force) {
 
         override fun toString() =
-            "Move(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
+            "Insert(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
     }
 
     class Shift(
@@ -103,6 +103,16 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
 
         override fun toString() =
             "Up(indices=${indices.toList()}, title=$title, force=$force)"
+    }
+
+    class Divide(
+        val pivotIndex: Int,
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "Divide(pivotIndex=$pivotIndex, title=$title, force=$force)"
     }
 
     object Empty : SortingAlgorithmStep("", force = false)  {
