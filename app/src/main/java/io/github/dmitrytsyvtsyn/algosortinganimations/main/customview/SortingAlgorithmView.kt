@@ -59,8 +59,9 @@ class SortingAlgorithmView(context: Context) : View(context) {
     private val textBounds = Rect()
 
     private val sortingItemsStates = mutableListOf<SortingItemState>()
-    private val pendingSortingItemStates = SparseArray<SortingItemState>()
     private var sortingArrayCopy = intArrayOf()
+
+    private val pendingTransaction = PendingSortingTransaction(SparseArray(8))
 
     private var stepIndex = -1
     private var stepListener: (Int, SortingAlgorithmStep) -> Unit = { _, _ -> }
@@ -140,7 +141,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
             canvas.drawState(state, animationTime)
             haveItemsAnimation = haveItemsAnimation || state.isAnimationRunning
 
-            val pendingState = pendingSortingItemStates.get(index)
+            val pendingState = pendingTransaction.fetch(index)
             if (pendingState != null) {
                 canvas.drawState(pendingState, animationTime)
                 haveItemsAnimation = haveItemsAnimation || pendingState.isAnimationRunning
@@ -296,7 +297,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
         // finish the current step animations
         sortingItemsStates.forEach { state -> state.finishAnimation() }
-        pendingSortingItemStates.forEach { _, state -> state.finishAnimation() }
+        pendingTransaction.finishAnimation()
         pausedAnimationTime = 0L
         invokeStepFinishActions()
 
@@ -366,7 +367,8 @@ class SortingAlgorithmView(context: Context) : View(context) {
         var status = HandleStepStatus.ANIMATION_INVALIDATE
         // case: startAnimation() call after pauseAnimation() call
         // the paused animation needs to be finished
-        if (sortingItemsStates.none { it.isAnimationRunning }) {
+        val isAnimationRunning = checkAnimationRunning()
+        if (!isAnimationRunning) {
             val step = steps.fetchCurrentOrEmptyStep(stepIndex)
             stepListener.invoke(stepIndex, step)
 
@@ -420,6 +422,10 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 throw IllegalStateException("The step ${steps[stepIndex]} has invalid field values")
             }
         }
+    }
+
+    private fun checkAnimationRunning(): Boolean {
+        return sortingItemsStates.any { it.isAnimationRunning } || pendingTransaction.isAnimationRunning
     }
 
     private fun handleStep(step: SortingAlgorithmStep.Select, animate: Boolean = true): HandleStepStatus {
@@ -543,7 +549,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
         val topPosition1 = state1.value(SortingItemState.AnimationKey.TopPosition)
         val topPosition2 = state2.value(SortingItemState.AnimationKey.TopPosition)
 
-        return when {
+        when {
             animate -> {
                 state1
                     .changeDuration(SortingItemState.AnimationKey.StartPosition, movingAnimationDuration)
@@ -576,8 +582,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
                     sortingItemsStates[index2] = state1
                     true
                 }
-
-                HandleStepStatus.ANIMATION_INVALIDATE
             }
             else -> {
                 state1.forceValue(SortingItemState.AnimationKey.StartPosition, startPosition2)
@@ -585,10 +589,13 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
                 sortingItemsStates[index1] = state2
                 sortingItemsStates[index2] = state1
-
-                HandleStepStatus.JUST_INVALIDATE
             }
         }
+
+        if (animate) {
+            return HandleStepStatus.ANIMATION_INVALIDATE
+        }
+        return HandleStepStatus.JUST_INVALIDATE
     }
 
     private fun handleStep(step: SortingAlgorithmStep.Insert, animate: Boolean): HandleStepStatus {
@@ -599,7 +606,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
         if (currentIndex !in indices && newIndex !in indices) return HandleStepStatus.ERROR_INVALIDATE
 
         var state = sortingItemsStates[currentIndex]
-        val pendingState = pendingSortingItemStates.get(currentIndex)
+        val pendingState = pendingTransaction.fetch(currentIndex)
         if (pendingState != null) {
             state = pendingState
         }
@@ -607,7 +614,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
         val startPosition = startOfView + itemSize * newIndex
         val topPosition = state.value(SortingItemState.AnimationKey.TopPosition) + itemSize + itemMargin
 
-        return when {
+        when {
             animate -> {
                 state
                     .changeDuration(SortingItemState.AnimationKey.StartPosition, movingAnimationDuration)
@@ -621,12 +628,10 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
                 stepFinishActions.add {
                     sortingItemsStates[newIndex] = state
-                    pendingSortingItemStates.remove(currentIndex)
+                    pendingTransaction.apply()
 
                     true
                 }
-
-                HandleStepStatus.ANIMATION_INVALIDATE
             }
             else -> {
                 state
@@ -634,11 +639,14 @@ class SortingAlgorithmView(context: Context) : View(context) {
                     .forceValue(SortingItemState.AnimationKey.TopPosition, topPosition)
 
                 sortingItemsStates[newIndex] = state
-                pendingSortingItemStates.remove(currentIndex)
-
-                HandleStepStatus.JUST_INVALIDATE
+                pendingTransaction.apply()
             }
         }
+
+        if (animate) {
+            return HandleStepStatus.ANIMATION_INVALIDATE
+        }
+        return HandleStepStatus.JUST_INVALIDATE
     }
 
     private fun handleStep(step: SortingAlgorithmStep.Shift, animate: Boolean): HandleStepStatus {
@@ -651,8 +659,8 @@ class SortingAlgorithmView(context: Context) : View(context) {
         val state = sortingItemsStates[currentIndex]
 
         val shiftCount = newIndex - currentIndex
-        val newStartPosition = state.value(SortingItemState.AnimationKey.StartPosition) + itemSize * shiftCount
-        return when {
+        val startPosition = state.value(SortingItemState.AnimationKey.StartPosition) + itemSize * shiftCount
+        when {
             animate -> {
                 var startPositionDuration = movingAnimationDuration
                 if (shiftCount.absoluteValue == 1) {
@@ -661,24 +669,27 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
                 state
                     .changeDuration(SortingItemState.AnimationKey.StartPosition, startPositionDuration)
-                    .addValue(SortingItemState.AnimationKey.StartPosition, newStartPosition)
+                    .addValue(SortingItemState.AnimationKey.StartPosition, startPosition)
 
                 stepFinishActions.add {
                     sortingItemsStates[newIndex] = state
+                    pendingTransaction.add(currentIndex, state)
 
                     true
                 }
-
-                HandleStepStatus.ANIMATION_INVALIDATE
             }
             else -> {
-                state.forceValue(SortingItemState.AnimationKey.StartPosition, newStartPosition)
+                state.forceValue(SortingItemState.AnimationKey.StartPosition, startPosition)
 
                 sortingItemsStates[newIndex] = state
-
-                HandleStepStatus.JUST_INVALIDATE
+                pendingTransaction.add(currentIndex, state)
             }
         }
+
+        if (animate) {
+            return HandleStepStatus.ANIMATION_INVALIDATE
+        }
+        return HandleStepStatus.JUST_INVALIDATE
     }
 
     private fun handleStep(step: SortingAlgorithmStep.Up, animate: Boolean): HandleStepStatus {
@@ -691,17 +702,23 @@ class SortingAlgorithmView(context: Context) : View(context) {
         uppedIndices.forEach { index ->
             val state = sortingItemsStates[index]
 
-            pendingSortingItemStates.put(index, state)
-
-            val newTopPosition = state.value(SortingItemState.AnimationKey.TopPosition) - itemSize - itemMargin
+            val topPosition = state.value(SortingItemState.AnimationKey.TopPosition) - itemSize - itemMargin
             when {
                 animate -> {
                     state
                         .changeDuration(SortingItemState.AnimationKey.TopPosition, movingAnimationDuration / 2)
-                        .addValue(SortingItemState.AnimationKey.TopPosition, newTopPosition)
+                        .addValue(SortingItemState.AnimationKey.TopPosition, topPosition)
+
+                    stepFinishActions.add {
+                        pendingTransaction.add(index, state)
+
+                        true
+                    }
                 }
                 else -> {
-                    state.forceValue(SortingItemState.AnimationKey.TopPosition, newTopPosition)
+                    state.forceValue(SortingItemState.AnimationKey.TopPosition, topPosition)
+
+                    pendingTransaction.add(index, state)
                 }
             }
         }
@@ -731,7 +748,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 }
             }
 
-            pendingSortingItemStates.put(index, state)
+            pendingTransaction.add(index, state)
             index++
         }
 
@@ -748,7 +765,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 }
             }
 
-            pendingSortingItemStates.put(index, state)
+            pendingTransaction.add(index, state)
             index++
         }
 
@@ -787,7 +804,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
         pausedAnimationTime = 0
         stepIndex = -1
 
-        pendingSortingItemStates.clear()
+        pendingTransaction.reset(sortingItemsStates)
 
         sortingItemsStates.matchWithSize(sortingArrayCopy.size) { SortingItemState() }
 
@@ -859,6 +876,38 @@ class SortingAlgorithmView(context: Context) : View(context) {
         JUST_INVALIDATE(8),
         NOT_INVALIDATE(7),
         ERROR_INVALIDATE(10)
+    }
+
+    @JvmInline
+    private value class PendingSortingTransaction(private val sparseArray: SparseArray<SortingItemState>) {
+        
+        val isAnimationRunning: Boolean
+            get() {
+                sparseArray.forEach { _, state ->
+                    if (state.isAnimationRunning) return true
+                }
+
+                return false
+            }
+        
+        fun add(index: Int, state: SortingItemState) {
+            sparseArray.put(index, state)
+        }
+
+        fun fetch(index: Int): SortingItemState? =
+            sparseArray.get(index)
+
+        fun apply() {
+            sparseArray.clear()
+        }
+
+        fun reset(states: MutableList<SortingItemState>) {
+            sparseArray.forEach { key, value -> states[key] = value }
+        }
+
+        fun finishAnimation() {
+            sparseArray.forEach { _, state -> state.finishAnimation() }
+        }
     }
 
 }
