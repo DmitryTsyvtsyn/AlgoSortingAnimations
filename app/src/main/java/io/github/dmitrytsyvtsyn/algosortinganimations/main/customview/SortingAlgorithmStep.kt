@@ -115,6 +115,27 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
             "Divide(pivotIndex=$pivotIndex, title=$title, force=$force)"
     }
 
+    class MergeTopCenter(
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "MergeTopCenter(title=$title, force=$force)"
+    }
+
+    class Merge(
+        val currentIndex: Int,
+        val newIndex: Int,
+        val offsetCount: Int = 0,
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "MergeLeft(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
+    }
+
     object Empty : SortingAlgorithmStep("", force = false)  {
         override fun toString() = "Empty"
     }

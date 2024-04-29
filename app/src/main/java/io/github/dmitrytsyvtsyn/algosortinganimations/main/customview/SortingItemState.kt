@@ -5,13 +5,13 @@ class SortingItemState {
     private var text: String = ""
 
     private val animatedProperties: Array<AnimatedArray<*>> = arrayOf(
-        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
-        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
-        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
-        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f)),
-        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0)),
-        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0)),
-        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0))
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)),
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)),
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)),
+        AnimatedFloatArray(floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)),
+        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0, 0, 0, 0)),
+        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0, 0, 0, 0)),
+        AnimatedColorArray(intArrayOf(0, 0, 0, 0, 0, 0, 0, 0))
     )
 
     private val animationDurations = LongArray(animatedProperties.size) { 0L }

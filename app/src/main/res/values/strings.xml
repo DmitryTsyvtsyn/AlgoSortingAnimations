@@ -44,4 +44,7 @@
     <string name="insertion_sort_shifting_number">Shift the number %1$d because it\'s greater than %2$d</string>
     <string name="insertion_sort_new_position_was_found">Found a new position for the number %1$d in the subarray</string>
     <string name="insertion_sort_position_was_not_changed">The position for the number %1$d has not changed in the subarray</string>
+
+    <!-- Merge sort -->
+    <string name="merge_sort">Merge sort</string>
 </resources>

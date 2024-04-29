@@ -44,4 +44,7 @@
     <string name="insertion_sort_shifting_number">Сдвигаем число %1$d так как оно больше %2$d</string>
     <string name="insertion_sort_new_position_was_found">Нашли новую позицию для числа %1$d в подмассиве</string>
     <string name="insertion_sort_position_was_not_changed">Позиция для числа %1$d не поменялась в подмассиве</string>
+
+    <!-- Merge sort -->
+    <string name="merge_sort">Merge sort</string>
 </resources>
