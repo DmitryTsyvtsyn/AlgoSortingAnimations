@@ -23,8 +23,8 @@ class MergeSortAlgorithm : SortingAlgorithm {
 
         steps.add(
             SortingAlgorithmStep.List(
-                steps = Array(arraySize - 1) { SortingAlgorithmStep.Divide(pivotIndex = it + 1) },
-                title = "Делим массив на части"
+                steps = Array(arraySize - 1) { SortingAlgorithmStep.MergeDivide(pivotIndex = it + 1) },
+                title = resources.getString(R.string.merge_sort_divide_array_into_parts)
             )
         )
 
@@ -49,7 +49,7 @@ class MergeSortAlgorithm : SortingAlgorithm {
                     steps.add(
                         SortingAlgorithmStep.Select(
                             indices = intArrayOf(i, j),
-                            title = "Сравниваем значение ${array[i]} со значением ${array[j]}"
+                            title = resources.getString(R.string.merge_sort_comparing_values, array[i], array[j])
                         )
                     )
 
@@ -57,17 +57,16 @@ class MergeSortAlgorithm : SortingAlgorithm {
                         steps.add(
                             SortingAlgorithmStep.List(
                                 steps = arrayOf(
-                                    SortingAlgorithmStep.Merge(
+                                    SortingAlgorithmStep.MergeMove(
                                         currentIndex = i,
                                         newIndex = k,
                                         offsetCount = offsetCount
-                                        //offsetCount = calcOffsetCount(i, k, windowSize, arraySize)
                                     ),
                                     SortingAlgorithmStep.Unselect(
                                         indices = intArrayOf(i, j),
                                     )
                                 ),
-                                title = "Значение ${array[i]} меньше, поэтому перемещаем его на правильную позицию"
+                                title = resources.getString(R.string.merge_sort_number_is_smaller_new_position_was_found, array[i])
                             )
                         )
 
@@ -77,17 +76,16 @@ class MergeSortAlgorithm : SortingAlgorithm {
                         steps.add(
                             SortingAlgorithmStep.List(
                                 steps = arrayOf(
-                                    SortingAlgorithmStep.Merge(
+                                    SortingAlgorithmStep.MergeMove(
                                         currentIndex = j,
                                         newIndex = k,
                                         offsetCount = offsetCount
-                                        //offsetCount = calcOffsetCount(i, k, windowSize, arraySize)
                                     ),
                                     SortingAlgorithmStep.Unselect(
                                         indices = intArrayOf(i, j),
                                     )
                                 ),
-                                title = "Значение ${array[j]} меньше, поэтому перемещаем его на правильную позицию"
+                                title = resources.getString(R.string.merge_sort_number_is_smaller_new_position_was_found, array[j])
                             )
                         )
 
@@ -99,11 +97,11 @@ class MergeSortAlgorithm : SortingAlgorithm {
 
                 while (i < middle) {
                     steps.add(
-                        SortingAlgorithmStep.Merge(
+                        SortingAlgorithmStep.MergeMove(
                             currentIndex = i,
                             newIndex = k,
                             offsetCount = offsetCount,
-                            title = "Перемещаем значение ${array[i]} на правильную позицию"
+                            title = resources.getString(R.string.merge_sort_moving_number_to_correct_position, array[i])
                         )
                     )
 
@@ -114,11 +112,11 @@ class MergeSortAlgorithm : SortingAlgorithm {
 
                 while (j < right) {
                     steps.add(
-                        SortingAlgorithmStep.Merge(
+                        SortingAlgorithmStep.MergeMove(
                             currentIndex = j,
                             newIndex = k,
                             offsetCount = offsetCount,
-                            title = "Перемещаем значение ${array[j]} на правильную позицию"
+                            title = resources.getString(R.string.merge_sort_moving_number_to_correct_position, array[j])
                         )
                     )
 
@@ -136,7 +134,9 @@ class MergeSortAlgorithm : SortingAlgorithm {
                 left += windowSize * 2
             }
 
-            steps.add(SortingAlgorithmStep.MergeTopCenter(title = ""))
+            steps.add(SortingAlgorithmStep.Merge(
+                title = resources.getString(R.string.merge_sort_sub_arrays_were_successfully_merged)
+            ))
 
             windowSize *= 2
         }

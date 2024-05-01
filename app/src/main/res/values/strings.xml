@@ -47,4 +47,10 @@
 
     <!-- Merge sort -->
     <string name="merge_sort">Merge sort</string>
+    <string name="merge_sort_divide_array_into_parts">Divide the array into parts</string>
+    <string name="merge_sort_comparing_values">Compare the number %1$d with the number %2$d</string>
+    <string name="merge_sort_number_is_smaller_new_position_was_found">The number %1$d is smaller so we move it to the correct position</string>
+    <string name="merge_sort_moving_number_to_correct_position">Moving the number %1$d to the correct position</string>
+    <string name="merge_sort_sub_arrays_were_successfully_merged">The subarrays were successfully merged with each other</string>
+
 </resources>

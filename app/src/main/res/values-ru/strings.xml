@@ -47,4 +47,10 @@
 
     <!-- Merge sort -->
     <string name="merge_sort">Merge sort</string>
+    <string name="merge_sort_divide_array_into_parts">Делим массив на части</string>
+    <string name="merge_sort_comparing_values">Сравниваем число %1$d с числом %2$d</string>
+    <string name="merge_sort_number_is_smaller_new_position_was_found">Число %1$d меньше, поэтому перемещаем его на правильную позицию</string>
+    <string name="merge_sort_moving_number_to_correct_position">Перемещаем число %1$d на правильную позицию</string>
+    <string name="merge_sort_sub_arrays_were_successfully_merged">Подмассивы были успешно смержены друг с другом</string>
+
 </resources>

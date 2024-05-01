@@ -84,7 +84,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
             "Insert(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
     }
 
-    class Shift(
+    class InsertShift(
         val currentIndex: Int,
         val newIndex: Int,
         title: String = "",
@@ -95,7 +95,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
             "Shift(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
     }
 
-    class Up(
+    class InsertUp(
         val indices: IntArray,
         title: String = "",
         force: Boolean = false
@@ -105,7 +105,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
             "Up(indices=${indices.toList()}, title=$title, force=$force)"
     }
 
-    class Divide(
+    class MergeDivide(
         val pivotIndex: Int,
         title: String = "",
         force: Boolean = false
@@ -115,7 +115,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
             "Divide(pivotIndex=$pivotIndex, title=$title, force=$force)"
     }
 
-    class MergeTopCenter(
+    class Merge(
         title: String = "",
         force: Boolean = false
     ) : SortingAlgorithmStep(title, force) {
@@ -124,7 +124,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
             "MergeTopCenter(title=$title, force=$force)"
     }
 
-    class Merge(
+    class MergeMove(
         val currentIndex: Int,
         val newIndex: Int,
         val offsetCount: Int = 0,

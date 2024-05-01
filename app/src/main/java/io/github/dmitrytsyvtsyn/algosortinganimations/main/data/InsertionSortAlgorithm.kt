@@ -35,7 +35,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                 SortingAlgorithmStep.List(
                     steps = arrayOf(
                         SortingAlgorithmStep.Select(indices = intArrayOf(i)),
-                        SortingAlgorithmStep.Up(indices = intArrayOf(i))
+                        SortingAlgorithmStep.InsertUp(indices = intArrayOf(i))
                     ),
                     title = resources.getString(R.string.insertion_sort_looking_for_new_position_for_number, current)
                 )
@@ -66,7 +66,7 @@ class InsertionSortAlgorithm : SortingAlgorithm {
                 steps.add(
                     SortingAlgorithmStep.List(
                         steps = arrayOf(
-                            SortingAlgorithmStep.Shift(
+                            SortingAlgorithmStep.InsertShift(
                                 currentIndex = j,
                                 newIndex = j + 1
                             ),
