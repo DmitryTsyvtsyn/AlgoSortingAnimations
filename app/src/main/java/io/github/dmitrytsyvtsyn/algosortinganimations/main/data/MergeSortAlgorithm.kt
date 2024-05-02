@@ -13,7 +13,7 @@ class MergeSortAlgorithm : SortingAlgorithm {
     override val worstTimeComplexity = "O(nlog(n))"
     override val bestTimeComplexity = "O(nlog(n))"
     override val averageTimeComplexity = "O(nlog(n))"
-    override val worstSpaceComplexity = "O(nlog(n))"
+    override val worstSpaceComplexity = "O(n)"
 
     override fun sort(array: IntArray, resources: Resources): List<SortingAlgorithmStep> {
         val steps = mutableListOf<SortingAlgorithmStep>()

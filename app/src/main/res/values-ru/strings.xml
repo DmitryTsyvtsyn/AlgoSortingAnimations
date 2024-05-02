@@ -53,4 +53,11 @@
     <string name="merge_sort_moving_number_to_correct_position">Перемещаем число %1$d на правильную позицию</string>
     <string name="merge_sort_sub_arrays_were_successfully_merged">Подмассивы были успешно смержены друг с другом</string>
 
+    <!-- Quick sort -->
+    <string name="quick_sort">Quick sort</string>
+    <string name="quick_sort_selecting_range">Выбираем диапазон массива</string>
+    <string name="quick_sort_selecting_pivot_number">Выбираем опорное число</string>
+    <string name="quick_sort_number_is_less_than_pivot">Число %1$d меньше опорного, перемещаем его в левую часть</string>
+    <string name="quick_sort_number_is_more_than_pivot">Число %1$d больше опорного, перемещаем его в правую часть</string>
+    <string name="quick_sort_array_was_sorted_successfully">Массив успешно отсортирован относительно опорного числа</string>
 </resources>

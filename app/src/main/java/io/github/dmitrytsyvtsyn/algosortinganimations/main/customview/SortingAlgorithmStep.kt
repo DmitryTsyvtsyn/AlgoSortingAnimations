@@ -92,7 +92,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
     ) : SortingAlgorithmStep(title, force) {
 
         override fun toString() =
-            "Shift(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
+            "InsertShift(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
     }
 
     class InsertUp(
@@ -102,7 +102,16 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
     ) : SortingAlgorithmStep(title, force) {
 
         override fun toString() =
-            "Up(indices=${indices.toList()}, title=$title, force=$force)"
+            "InsertUp(indices=${indices.toList()}, title=$title, force=$force)"
+    }
+
+    class Merge(
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "Merge(title=$title, force=$force)"
     }
 
     class MergeDivide(
@@ -112,16 +121,7 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
     ) : SortingAlgorithmStep(title, force) {
 
         override fun toString() =
-            "Divide(pivotIndex=$pivotIndex, title=$title, force=$force)"
-    }
-
-    class Merge(
-        title: String = "",
-        force: Boolean = false
-    ) : SortingAlgorithmStep(title, force) {
-
-        override fun toString() =
-            "MergeTopCenter(title=$title, force=$force)"
+            "MergeDivide(pivotIndex=$pivotIndex, title=$title, force=$force)"
     }
 
     class MergeMove(
@@ -133,7 +133,38 @@ sealed class SortingAlgorithmStep(val title: String, val force: Boolean) {
     ) : SortingAlgorithmStep(title, force) {
 
         override fun toString() =
-            "MergeLeft(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
+            "MergeMove(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
+    }
+
+    class Quick(
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "Quick(title=$title, force=$force)"
+    }
+
+    class QuickDown(
+        val currentIndex: Int,
+        val newIndex: Int,
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "QuickDown(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
+    }
+
+    class QuickMove(
+        val currentIndex: Int,
+        val newIndex: Int,
+        title: String = "",
+        force: Boolean = false
+    ) : SortingAlgorithmStep(title, force) {
+
+        override fun toString() =
+            "QuickMove(currentIndex=$currentIndex, newIndex=$newIndex, title=$title, force=$force)"
     }
 
     object Empty : SortingAlgorithmStep("", force = false)  {
