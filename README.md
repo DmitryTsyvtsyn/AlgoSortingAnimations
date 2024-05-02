@@ -17,6 +17,9 @@ Android app to understand how sorting algorithms work using the example of anima
 
 https://github.com/DmitryTsyvtsyn/AlgoSortingAnimations/assets/40917658/d6bfe2c4-921e-4e24-8583-5a455f538e58
 
+https://github.com/DmitryTsyvtsyn/AlgoSortingAnimations/assets/40917658/f1f91d07-c774-41bd-8c08-4dd11f3a1b55
+
 https://github.com/DmitryTsyvtsyn/AlgoSortingAnimations/assets/40917658/e2ba50c9-e3fd-4cb9-b298-4214e129dcbd
 
+https://github.com/DmitryTsyvtsyn/AlgoSortingAnimations/assets/40917658/979e0a1f-4cae-45aa-b09f-e6eed9a11b02
 
