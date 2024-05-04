@@ -54,10 +54,18 @@
     <string name="merge_sort_sub_arrays_were_successfully_merged">The subarrays were successfully merged with each other</string>
 
     <!-- Quick sort -->
-    <string name="quick_sort">Quick sort</string>
+    <string name="quick_sort_lomuto">Quick sort (Lomuto)</string>
+    <string name="quick_sort_hoare">Quick sort (Hoare)</string>
     <string name="quick_sort_selecting_range">Selecting the range of the array</string>
     <string name="quick_sort_selecting_pivot_number">Selecting the pivot number</string>
-    <string name="quick_sort_number_is_less_than_pivot">The number %1$d is less than the pivot so we move it to the left</string>
-    <string name="quick_sort_number_is_more_than_pivot">The number %1$d is more than the pivot so we move it to the right</string>
+    <string name="quick_sort_compare_number_from_beginning_with_pivot">We go from the beginning of the array, compare the number %1$d with the pivot</string>
+    <string name="quick_sort_compare_number_from_end_with_pivot">We go from the end of the array, compare the number %1$d with the pivot</string>
+    <string name="quick_sort_number_is_less_than_pivot_nothing_to_do">The number %1$d is less than the pivot, we do nothing</string>
+    <string name="quick_sort_number_is_more_than_pivot_nothing_to_do">The number %1$d is more than the pivot, we do nothing</string>
+    <string name="quick_sort_number_is_less_than_pivot_leave_for_exchange">The number %1$d is less than the pivot, leave it for exchange</string>
+    <string name="quick_sort_number_is_more_than_pivot_leave_for_exchange">The number %1$d is more than the pivot, leave it for exchange</string>
+    <string name="quick_sort_swapping_numbers">Swapping the numbers</string>
+    <string name="quick_sort_pivot_and_number_should_be_swapped">The pivot number and %1$d should be swapped</string>
+    <string name="quick_sort_numbers_should_be_swapped">The numbers %1$d and %2$d should be swapped</string>
     <string name="quick_sort_array_was_sorted_successfully">The array is successfully sorted relative to the pivot</string>
 </resources>

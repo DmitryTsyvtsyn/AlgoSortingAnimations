@@ -54,10 +54,18 @@
     <string name="merge_sort_sub_arrays_were_successfully_merged">Подмассивы были успешно смержены друг с другом</string>
 
     <!-- Quick sort -->
-    <string name="quick_sort">Quick sort</string>
+    <string name="quick_sort_lomuto">Quick sort (Lomuto)</string>
+    <string name="quick_sort_hoare">Quick sort (Hoare)</string>
     <string name="quick_sort_selecting_range">Выбираем диапазон массива</string>
     <string name="quick_sort_selecting_pivot_number">Выбираем опорное число</string>
-    <string name="quick_sort_number_is_less_than_pivot">Число %1$d меньше опорного, перемещаем его в левую часть</string>
-    <string name="quick_sort_number_is_more_than_pivot">Число %1$d больше опорного, перемещаем его в правую часть</string>
+    <string name="quick_sort_compare_number_from_beginning_with_pivot">Идём с начала массива, сравниваем число %1$d с опорным числом</string>
+    <string name="quick_sort_compare_number_from_end_with_pivot">Идём с конца массива, сравниваем число %1$d с опорным числом</string>
+    <string name="quick_sort_number_is_less_than_pivot_nothing_to_do">Число %1$d меньше опорного, ничего не делаем</string>
+    <string name="quick_sort_number_is_more_than_pivot_nothing_to_do">Число %1$d больше опорного, ничего не делаем</string>
+    <string name="quick_sort_number_is_less_than_pivot_leave_for_exchange">Число %1$d меньше опорного, оставляем для обмена</string>
+    <string name="quick_sort_number_is_more_than_pivot_leave_for_exchange">Число %1$d больше опорного, оставляем для обмена</string>
+    <string name="quick_sort_swapping_numbers">Меняем числа местами</string>
+    <string name="quick_sort_pivot_and_number_should_be_swapped">Опорное число и %1$d следует поменять местами</string>
+    <string name="quick_sort_numbers_should_be_swapped">Числа %1$d и %2$d следует поменять местами</string>
     <string name="quick_sort_array_was_sorted_successfully">Массив успешно отсортирован относительно опорного числа</string>
 </resources>

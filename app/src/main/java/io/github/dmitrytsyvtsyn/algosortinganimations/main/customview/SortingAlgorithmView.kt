@@ -395,10 +395,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 is SortingAlgorithmStep.MergeDivide -> handleStep(queuedStep, realAnimate)
                 is SortingAlgorithmStep.MergeMove -> handleStep(queuedStep, realAnimate)
 
-                is SortingAlgorithmStep.Quick -> handleStep(queuedStep, realAnimate)
-                is SortingAlgorithmStep.QuickDown -> handleStep(queuedStep, realAnimate)
-                is SortingAlgorithmStep.QuickMove -> handleStep(queuedStep, realAnimate)
-
                 is SortingAlgorithmStep.End -> handleStep(queuedStep, realAnimate)
                 is SortingAlgorithmStep.Empty -> handleStep(queuedStep, realAnimate)
                 else -> throw IllegalStateException("Unhandled step: $queuedStep")
@@ -433,24 +429,31 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
     private fun handleStep(step: SortingAlgorithmStep.Select, animate: Boolean = true): HandleStepStatus {
         val selectedIndices = step.indices
+        val type = step.type
         val totalIndices = sortingItemsStates.indices
 
         if (selectedIndices.isEmpty()) return HandleStepStatus.ERROR_INVALIDATE
         if (selectedIndices.any { index -> index !in totalIndices }) return HandleStepStatus.ERROR_INVALIDATE
 
         selectedIndices.forEach { index ->
-            if (index in totalIndices) {
-                when {
-                    animate -> {
-                        sortingItemsStates[index]
-                            .addValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
-                            .addValue(SortingItemState.AnimationKey.TextColor, selectedTextColor)
-                    }
-                    else -> {
-                        sortingItemsStates[index]
-                            .forceValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
-                            .forceValue(SortingItemState.AnimationKey.TextColor, selectedTextColor)
-                    }
+            when {
+                animate && type == SortingAlgorithmStep.Select.Type.BACKGROUND -> {
+                    sortingItemsStates[index]
+                        .addValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
+                        .addValue(SortingItemState.AnimationKey.TextColor, selectedTextColor)
+                }
+                animate && type == SortingAlgorithmStep.Select.Type.BORDER -> {
+                    sortingItemsStates[index]
+                        .addValue(SortingItemState.AnimationKey.StrokeWidth, selectedStrokeWidth)
+                }
+                type == SortingAlgorithmStep.Select.Type.BACKGROUND -> {
+                    sortingItemsStates[index]
+                        .forceValue(SortingItemState.AnimationKey.SelectedSize, itemSize)
+                        .forceValue(SortingItemState.AnimationKey.TextColor, selectedTextColor)
+                }
+                type == SortingAlgorithmStep.Select.Type.BORDER -> {
+                    sortingItemsStates[index]
+                        .forceValue(SortingItemState.AnimationKey.StrokeWidth, selectedStrokeWidth)
                 }
             }
         }
@@ -463,6 +466,7 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
     private fun handleStep(step: SortingAlgorithmStep.Unselect, animate: Boolean = true): HandleStepStatus {
         val selectedIndices = step.indices
+        val type = step.type
         val totalIndices = sortingItemsStates.indices
 
         if (selectedIndices.isEmpty()) return HandleStepStatus.ERROR_INVALIDATE
@@ -470,15 +474,23 @@ class SortingAlgorithmView(context: Context) : View(context) {
 
         selectedIndices.forEach { index ->
             when {
-                animate -> {
+                animate && type == SortingAlgorithmStep.Unselect.Type.BACKGROUND  -> {
                     sortingItemsStates[index]
                         .addValue(SortingItemState.AnimationKey.SelectedSize, 0f)
                         .addValue(SortingItemState.AnimationKey.TextColor, defaultTextColor)
                 }
-                else -> {
+                animate && type == SortingAlgorithmStep.Unselect.Type.BORDER -> {
+                    sortingItemsStates[index]
+                        .addValue(SortingItemState.AnimationKey.StrokeWidth, defaultStrokeWidth)
+                }
+                type == SortingAlgorithmStep.Unselect.Type.BACKGROUND -> {
                     sortingItemsStates[index]
                         .forceValue(SortingItemState.AnimationKey.SelectedSize, 0f)
                         .forceValue(SortingItemState.AnimationKey.TextColor, defaultTextColor)
+                }
+                type == SortingAlgorithmStep.Unselect.Type.BORDER -> {
+                    sortingItemsStates[index]
+                        .forceValue(SortingItemState.AnimationKey.StrokeWidth, defaultStrokeWidth)
                 }
             }
         }
@@ -814,105 +826,6 @@ class SortingAlgorithmView(context: Context) : View(context) {
                 state
                     .forceValue(SortingItemState.AnimationKey.TopPosition, topPosition)
                     .forceValue(SortingItemState.AnimationKey.StartPosition, startPosition)
-
-                pendingTransaction.add(newIndex, state)
-            }
-        }
-
-        if (animate) {
-            return HandleStepStatus.ANIMATION_INVALIDATE
-        }
-        return HandleStepStatus.JUST_INVALIDATE
-    }
-
-    private fun handleStep(step: SortingAlgorithmStep.Quick, animate: Boolean): HandleStepStatus {
-        sortingItemsStates.forEach { state ->
-            when {
-                animate -> {
-                    state.addValue(SortingItemState.AnimationKey.TopPosition, topOfView)
-                }
-                else -> {
-                    state.forceValue(SortingItemState.AnimationKey.TopPosition, topOfView)
-                }
-            }
-        }
-
-        if (animate) {
-            stepFinishActions.add {
-                pendingTransaction.apply(sortingItemsStates)
-
-                true
-            }
-            return HandleStepStatus.ANIMATION_INVALIDATE
-        }
-
-        pendingTransaction.apply(sortingItemsStates)
-        return HandleStepStatus.JUST_INVALIDATE
-    }
-
-    private fun handleStep(step: SortingAlgorithmStep.QuickDown, animate: Boolean): HandleStepStatus {
-        val currentIndex = step.currentIndex
-        val newIndex = step.newIndex
-        val totalIndices = sortingItemsStates.indices
-
-        if (currentIndex !in totalIndices && newIndex !in totalIndices) return HandleStepStatus.ERROR_INVALIDATE
-
-        val state = sortingItemsStates[currentIndex]
-        val topPosition = state.value(SortingItemState.AnimationKey.TopPosition) + itemSize + itemMargin
-        val startPosition = startOfView + newIndex * itemSize
-        when {
-            animate -> {
-                state
-                    .addValue(SortingItemState.AnimationKey.StartPosition, startPosition)
-                    .addValue(SortingItemState.AnimationKey.TopPosition, topPosition)
-
-                stepFinishActions.add {
-                    pendingTransaction.add(newIndex, state)
-
-                    true
-                }
-            }
-            else -> {
-                state
-                    .forceValue(SortingItemState.AnimationKey.StartPosition, startPosition)
-                    .forceValue(SortingItemState.AnimationKey.TopPosition, topPosition)
-
-                pendingTransaction.add(newIndex, state)
-            }
-        }
-
-        if (animate) {
-            return HandleStepStatus.ANIMATION_INVALIDATE
-        }
-        return HandleStepStatus.JUST_INVALIDATE
-    }
-
-    private fun handleStep(step: SortingAlgorithmStep.QuickMove, animate: Boolean): HandleStepStatus {
-        val currentIndex = step.currentIndex
-        val newIndex = step.newIndex
-        val totalIndices = sortingItemsStates.indices
-
-        if (currentIndex !in totalIndices || newIndex !in totalIndices) return HandleStepStatus.ERROR_INVALIDATE
-
-        val state = sortingItemsStates[currentIndex]
-        val startPosition = startOfView + newIndex * itemSize
-        val topPosition = topOfView + itemSize + itemMargin
-        when {
-            animate -> {
-                state
-                    .addValue(SortingItemState.AnimationKey.StartPosition, startPosition)
-                    .addValue(SortingItemState.AnimationKey.TopPosition, topPosition)
-
-                stepFinishActions.add {
-                    pendingTransaction.add(newIndex, state)
-
-                    true
-                }
-            }
-            else -> {
-                state
-                    .forceValue(SortingItemState.AnimationKey.StartPosition, startPosition)
-                    .forceValue(SortingItemState.AnimationKey.TopPosition, topPosition)
 
                 pendingTransaction.add(newIndex, state)
             }
