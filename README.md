@@ -23,3 +23,7 @@ https://github.com/DmitryTsyvtsyn/AlgoSortingAnimations/assets/40917658/e2ba50c9
 
 https://github.com/DmitryTsyvtsyn/AlgoSortingAnimations/assets/40917658/979e0a1f-4cae-45aa-b09f-e6eed9a11b02
 
+https://github.com/DmitryTsyvtsyn/AlgoSortingAnimations/assets/40917658/1781fb0b-b31c-4679-995c-45766033d29a
+
+https://github.com/DmitryTsyvtsyn/AlgoSortingAnimations/assets/40917658/5bee7bcc-03b8-45cc-9ecc-83ccc2a2d894
+
