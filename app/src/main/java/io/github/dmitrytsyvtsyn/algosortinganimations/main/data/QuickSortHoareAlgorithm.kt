@@ -17,7 +17,7 @@ class QuickSortHoareAlgorithm : SortingAlgorithm {
     override fun sort(array: IntArray, resources: Resources): List<SortingAlgorithmStep> {
         val steps = mutableListOf<SortingAlgorithmStep>()
 
-        sortRecursive(steps, array, array.sortedArray(), resources)
+        sortRecursive(steps, array, resources)
 
         steps.add(SortingAlgorithmStep.End(resources.getString(R.string.array_was_sorted)))
 
@@ -27,7 +27,6 @@ class QuickSortHoareAlgorithm : SortingAlgorithm {
     private fun sortRecursive(
         steps: MutableList<SortingAlgorithmStep>,
         array: IntArray,
-        sortedArray: IntArray,
         resources: Resources,
         start: Int = 0,
         end: Int = array.size - 1
@@ -191,11 +190,11 @@ class QuickSortHoareAlgorithm : SortingAlgorithm {
         )
 
         if (i < end) {
-            sortRecursive(steps, array, sortedArray, resources, i, end)
+            sortRecursive(steps, array, resources, i, end)
         }
 
         if (start < j) {
-            sortRecursive(steps, array, sortedArray, resources, start, j)
+            sortRecursive(steps, array, resources, start, j)
         }
     }
 

@@ -6,6 +6,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.BubbleSortBetter
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.InsertionSortAlgorithm
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.MergeSortAlgorithm
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.QuickSortHoareAlgorithm
+import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.QuickSortLomutoAlgorithm
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.data.SelectionSortAlgorithm
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +19,7 @@ class SortingAlgorithmSelectionViewModel : CoreViewModel {
         SelectionSortAlgorithm(),
         InsertionSortAlgorithm(),
         MergeSortAlgorithm(),
+        QuickSortLomutoAlgorithm(),
         QuickSortHoareAlgorithm()
     ))
     val state = _state.asStateFlow()

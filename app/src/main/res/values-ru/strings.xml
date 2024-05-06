@@ -60,10 +60,17 @@
     <string name="quick_sort_selecting_pivot_number">Выбираем опорное число</string>
     <string name="quick_sort_compare_number_from_beginning_with_pivot">Идём с начала массива, сравниваем число %1$d с опорным числом</string>
     <string name="quick_sort_compare_number_from_end_with_pivot">Идём с конца массива, сравниваем число %1$d с опорным числом</string>
+    <string name="quick_sort_go_through_array_with_index_i">Идём по массиву i индексом</string>
+    <string name="quick_sort_go_through_array_with_index_j">Идём по массиву j индексом и сравниваем его с i индексом</string>
+    <string name="quick_sort_comparing_number_at_index_i_with_pivot">Сравниваем число %1$d по i индексу с опорным числом</string>
     <string name="quick_sort_number_is_less_than_pivot_nothing_to_do">Число %1$d меньше опорного, ничего не делаем</string>
     <string name="quick_sort_number_is_more_than_pivot_nothing_to_do">Число %1$d больше опорного, ничего не делаем</string>
     <string name="quick_sort_number_is_less_than_pivot_leave_for_exchange">Число %1$d меньше опорного, оставляем для обмена</string>
     <string name="quick_sort_number_is_more_than_pivot_leave_for_exchange">Число %1$d больше опорного, оставляем для обмена</string>
+    <string name="quick_sort_number_at_index_i_is_less_or_equal_pivot">Число %1$d по i индексу меньше или равно опорному</string>
+    <string name="quick_sort_number_at_index_i_is_more_pivot">Число %1$d по i индексу больше опорного числа, ничего не делаем</string>
+    <string name="quick_sort_indices_are_not_equal">Индексы не равны, поэтому меняем числа местами</string>
+    <string name="quick_sort_indices_are_equal">Индексы равны, ничего не делаем</string>
     <string name="quick_sort_swapping_numbers">Меняем числа местами</string>
     <string name="quick_sort_pivot_and_number_should_be_swapped">Опорное число и %1$d следует поменять местами</string>
     <string name="quick_sort_numbers_should_be_swapped">Числа %1$d и %2$d следует поменять местами</string>
