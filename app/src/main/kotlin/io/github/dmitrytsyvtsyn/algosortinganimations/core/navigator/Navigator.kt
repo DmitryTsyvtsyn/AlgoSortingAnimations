@@ -21,21 +21,24 @@ class Navigator(
 
     private val stackId = R.id.navigation_stack
 
-    fun navigateForward(event: NavigationScreen, isAddToBackStack: Boolean = true) {
+    private val NavigationScreen.viewModelKey: String
+        get() = "ViewModelProvider.SubProvider.Key.${this::class.java.canonicalName}"
+
+    fun navigateForward(screen: NavigationScreen, isAddToBackStack: Boolean = true) {
         when {
             isAddToBackStack -> {
-                val key = key(event::class.java)
+                val key = screen.viewModelKey
                 val provider = parentViewModelProvider().provideSubProvider(key)
                 providers[key] = provider
-                parent.addView(event.view(BaseParams(parent.context, this, provider)))
-                stack.add(event)
+                parent.addView(screen.view(BaseParams(parent.context, this, provider)))
+                stack.add(screen)
 
                 val callback = createOnBackPressedCallback()
                 callbacks.add(callback)
                 onBackPressedDispatcher.addCallback(callback)
             }
             else -> {
-                parent.addView(event.view(BaseParams(parent.context, this, viewModelProvider)))
+                parent.addView(screen.view(BaseParams(parent.context, this, viewModelProvider)))
             }
         }
     }
@@ -43,8 +46,8 @@ class Navigator(
     fun navigateBack(): Boolean {
         if (stack.isEmpty()) return false
 
-        val event = stack.removeLast()
-        val key = key(event::class.java)
+        val screen = stack.removeLast()
+        val key = screen.viewModelKey
         viewModelProvider.removeSubProvider(key)
         providers.remove(key)
         parent.removeLast()
@@ -85,13 +88,10 @@ class Navigator(
             }
         }
 
-    private fun key(navigationScreenClass: Class<out NavigationScreen>) =
-        "ViewModelProvider.SubProvider.Key.${navigationScreenClass.canonicalName}"
-
     private fun parentViewModelProvider(): ViewModelProvider {
         if (stack.isEmpty()) return viewModelProvider
 
-        val key = key(stack.last()::class.java)
+        val key = stack.last().viewModelKey
         return providers[key] ?: throw IllegalStateException("Not found such a ViewModelProvider with the key: $key")
     }
 
