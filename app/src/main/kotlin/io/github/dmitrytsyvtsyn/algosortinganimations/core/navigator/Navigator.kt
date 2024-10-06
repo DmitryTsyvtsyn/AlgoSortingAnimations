@@ -1,11 +1,10 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.core.navigator
 
-import android.view.View
 import android.view.ViewGroup
 import io.github.dmitrytsyvtsyn.algosortinganimations.R
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.data.MemoryIDIdentityCache
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.ViewModelProvider
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.extensions.removeLast
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel.ViewModelProvider
 
 class Navigator(
     private val parent: ViewGroup,
@@ -75,10 +74,6 @@ class Navigator(
         callbacks.forEach { it.changeIsEnabled(false) }
 
         cache.save(stackId, stack)
-    }
-
-    fun interface NavigationScreen {
-        fun view(params: BaseParams): View
     }
 
     private fun createOnBackPressedCallback() =
