@@ -26,7 +26,7 @@ import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.layout_params
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.shape.ShapeTreatmentStrategy
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceAttribute
 import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceManager
-import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefacePath
+import io.github.dmitrytsyvtsyn.algosortinganimations.core.theming.typeface.TypefaceWeight
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.customview.SortingAlgorithmView
 import io.github.dmitrytsyvtsyn.algosortinganimations.main.viewmodel.SortingAlgorithmState
 import io.github.dmitrytsyvtsyn.algosortinganimations.new_array.SortingNewArrayDialog
@@ -253,7 +253,7 @@ class SortingAlgorithmMainFragment(params: BaseParams) : CoreLinearLayout(params
             textColor = theme.colors[ColorAttributes.primaryTextColor],
             selectedTextColor = theme.colors[ColorAttributes.colorOnPrimary],
             selectedRangeColor = CoreColors.blueMedium,
-            typeface = TypefaceManager.typeface(TypefacePath.MEDIUM)
+            typeface = TypefaceManager.typeface(TypefaceWeight.MEDIUM)
         )
 
         padding(top = insets.top, bottom = insets.bottom)
