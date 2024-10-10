@@ -12,7 +12,7 @@ class ViewModelProviderTest {
         val rootProvider = ViewModelProvider()
 
         // create first-level ViewModelProvider
-        val sortingMainProvider = rootProvider.provideSubProvider("sortingMainProvider")
+        val sortingMainProvider = rootProvider.createChildProvider("sortingMainProvider")
 
         // try to get SortingMainViewModel when it does not exist
         assertThrows(IllegalStateException::class.java) {
@@ -25,7 +25,7 @@ class ViewModelProviderTest {
         sortingMainViewModel.step = 13
 
         // create child ViewModelProvider
-        val sortingListProvider = sortingMainProvider.provideSubProvider("sortingListProvider")
+        val sortingListProvider = sortingMainProvider.createChildProvider("sortingListProvider")
 
         // get parent ViewModel because child ViewModelProviders has access to it
         val parentViewModel = sortingListProvider.provide(SortingMainViewModel::class.java)

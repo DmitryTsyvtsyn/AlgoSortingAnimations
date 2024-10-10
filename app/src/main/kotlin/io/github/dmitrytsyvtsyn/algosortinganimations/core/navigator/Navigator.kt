@@ -27,7 +27,7 @@ class Navigator(
         when {
             isAddToBackStack -> {
                 val key = screen.viewModelKey
-                val provider = parentViewModelProvider().provideSubProvider(key)
+                val provider = parentViewModelProvider().createChildProvider(key)
                 providers[key] = provider
                 parent.addView(screen.view(BaseParams(parent.context, this, provider)))
                 stack.add(screen)
@@ -47,7 +47,7 @@ class Navigator(
 
         val screen = stack.removeLast()
         val key = screen.viewModelKey
-        viewModelProvider.removeSubProvider(key)
+        viewModelProvider.removeChildProvider(key)
         providers.remove(key)
         parent.removeLast()
         callbacks.removeLast().changeIsEnabled(false)

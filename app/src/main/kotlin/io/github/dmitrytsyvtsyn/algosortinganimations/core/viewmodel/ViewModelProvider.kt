@@ -1,31 +1,32 @@
 package io.github.dmitrytsyvtsyn.algosortinganimations.core.viewmodel
 
+@Suppress("UNCHECKED_CAST")
 class ViewModelProvider : CoreViewModel {
 
     private val cache = hashMapOf<String, CoreViewModel>()
 
-    fun provideSubProvider(key: String, factory: () -> ViewModelProvider = ::ViewModelProvider): ViewModelProvider {
+    fun createChildProvider(key: String): ViewModelProvider {
         val provider = cache[key]
         if (provider != null && provider is ViewModelProvider) return provider
 
-        val newProvider = factory.invoke()
-        val newProviderCache = newProvider.cache
+        val childProvider = ViewModelProvider()
+        val childProviderCache = childProvider.cache
         // child ViewModelProviders must have access to parent ViewModels
         cache.forEach { (key, value) ->
             if (value !is ViewModelProvider) {
-                newProviderCache[key] = value
+                childProviderCache[key] = value
             }
         }
 
-        cache[key] = newProvider
+        cache[key] = childProvider
 
-        return newProvider
+        return childProvider
     }
 
-    fun removeSubProvider(key: String) {
-        val viewModel = cache[key]
-        if (viewModel is ViewModelProvider) {
-            viewModel.cache.clear()
+    fun removeChildProvider(key: String) {
+        val provider = cache[key]
+        if (provider is ViewModelProvider) {
+            provider.cache.clear()
             cache.remove(key)
         }
     }
